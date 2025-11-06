@@ -34,7 +34,7 @@ export default function AccountPage() {
     setLoading(false);
   };
 
-  const handleUpgrade = async (method: 'stripe' | 'yookassa' | 'crypto') => {
+  const handleUpgrade = async (method: 'yookassa' | 'crypto') => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
@@ -43,9 +43,7 @@ export default function AccountPage() {
       }
 
       let endpoint = '';
-      if (method === 'stripe') {
-        endpoint = '/api/stripe/checkout';
-      } else if (method === 'yookassa') {
+      if (method === 'yookassa') {
         endpoint = '/api/yookassa/checkout';
       } else {
         endpoint = '/api/crypto/checkout';
@@ -115,13 +113,7 @@ export default function AccountPage() {
             <div>
               <p className="text-gray-300 mb-6">Бесплатный тариф: 10 сообщений в день</p>
               <p className="text-sm text-gray-400 mb-4">Выберите способ оплаты:</p>
-              <div className="grid md:grid-cols-3 gap-4">
-                <button
-                  onClick={() => handleUpgrade('stripe')}
-                  className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold rounded-xl transition-all"
-                >
-                  💳 Stripe (990₽/мес)
-                </button>
+              <div className="grid md:grid-cols-2 gap-4">
                 <button
                   onClick={() => handleUpgrade('yookassa')}
                   className="px-6 py-3 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white font-semibold rounded-xl transition-all"
