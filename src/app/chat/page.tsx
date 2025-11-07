@@ -116,6 +116,7 @@ export default function ChatPage() {
       created_at: new Date().toISOString(),
     };
 
+    const assistantMessageId = crypto.randomUUID();
     addOptimisticMessage(userMessage);
 
     // Сохраняем сообщение пользователя
@@ -158,7 +159,7 @@ export default function ChatPage() {
       }
 
       let fullResponse = '';
-      const assistantMessageId = crypto.randomUUID();
+      let hasError = false;
       
       // Создаём временное сообщение для streaming
       const tempMessage: ChatMessage = {
@@ -231,6 +232,7 @@ export default function ChatPage() {
                   return updated;
                 });
               } else if (parsed.error) {
+                hasError = true;
                 throw new Error(parsed.error);
               }
             } catch (e) {
@@ -244,7 +246,11 @@ export default function ChatPage() {
       toast.error(`Ошибка: ${errorMessage}`);
       
       // Удаляем optimistic сообщения при ошибке
-      setMessages((prev) => prev.filter(m => m.id !== userMessage.id && m.id !== assistantMessageId));
+      setMessages((prev) => {
+        const filtered = prev.filter(m => m.id !== userMessage.id);
+        // Удаляем assistant message если оно было создано
+        return filtered.filter(m => !(m.id === assistantMessageId && m.content === ''));
+      });
     } finally {
       setLoading(false);
     }

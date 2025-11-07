@@ -5,11 +5,12 @@ import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { toast } from 'sonner';
-import type { User, Profile } from '@/lib/types';
+import type { Profile } from '@/lib/types';
+import type { User as SupabaseUser } from '@supabase/supabase-js';
 
 export default function AccountPage() {
   const router = useRouter();
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<SupabaseUser | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
 

@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [email, setEmail] = useState('');
@@ -38,10 +38,11 @@ export default function LoginPage() {
     });
 
     if (error) {
+      console.error('Login error:', error);
       // Более понятные сообщения об ошибках
       if (error.message.includes('Invalid login credentials')) {
-        setError('Неверный email или пароль');
-      } else if (error.message.includes('Email not confirmed')) {
+        setError('Неверный email или пароль. Проверьте правильность введённых данных.');
+      } else if (error.message.includes('Email not confirmed') || error.message.includes('email_not_confirmed')) {
         setError('Email не подтверждён. Проверьте почту и перейдите по ссылке подтверждения.');
       } else {
         setError(error.message || 'Ошибка входа');
@@ -50,11 +51,14 @@ export default function LoginPage() {
       return;
     }
 
+    console.log('Login data:', { user: data.user?.id, session: !!data.session });
+
     if (data.session) {
       // Проверяем redirect параметр
       const redirect = searchParams.get('redirect');
       router.push(redirect || '/chat');
     } else {
+      console.error('No session after login');
       setError('Не удалось создать сессию. Попробуйте ещё раз.');
     }
     setLoading(false);
@@ -111,6 +115,18 @@ export default function LoginPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-gray-900 px-4">
+        <div className="text-gray-400">Загрузка...</div>
+      </div>
+    }>
+      <LoginForm />
+    </Suspense>
   );
 }
 

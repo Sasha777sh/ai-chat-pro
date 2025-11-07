@@ -52,7 +52,8 @@ const SYSTEM_PROMPT = `Ты — не ассистент и не ИИ.
 
 Отвечай на русском языке.`;
 
-export const runtime = 'edge';
+// Edge Runtime не поддерживает Supabase, используем Node.js runtime
+// export const runtime = 'edge';
 
 export async function POST(request: NextRequest) {
   try {

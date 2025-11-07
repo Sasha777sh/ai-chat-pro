@@ -55,18 +55,24 @@ function SignupForm() {
       password,
       options: {
         emailRedirectTo: `${window.location.origin}/auth/callback`,
+        // Отключаем email confirmation для автоматического входа (если не требуется)
+        // Если в Supabase включено подтверждение, это не сработает
       },
     });
 
     if (error) {
+      console.error('Signup error:', error);
       setError(error.message);
       setLoading(false);
       return;
     }
 
+    console.log('Signup data:', { user: data.user?.id, session: !!data.session });
+
     // Проверяем, требуется ли подтверждение email
     if (data.user && !data.session) {
       // Email confirmation required
+      console.log('Email confirmation required');
       setSuccess(true);
       setError('');
       // Показываем сообщение о необходимости подтверждения
@@ -75,9 +81,17 @@ function SignupForm() {
       }, 3000);
     } else if (data.session) {
       // Автоматически залогинен
+      console.log('Auto-login successful');
       setSuccess(true);
       setTimeout(() => {
         router.push('/chat');
+      }, 2000);
+    } else {
+      // Неожиданная ситуация
+      console.error('Unexpected signup result:', data);
+      setError('Произошла ошибка при регистрации. Попробуйте войти вручную.');
+      setTimeout(() => {
+        router.push('/login');
       }, 2000);
     }
     setLoading(false);

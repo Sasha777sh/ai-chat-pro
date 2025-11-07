@@ -15,7 +15,9 @@ const limiter = rateLimit({ windowMs: 60 * 1000, max: 30 });
 export async function POST(request: NextRequest) {
   try {
     // Rate limiting
-    const ip = request.ip || request.headers.get('x-forwarded-for') || 'unknown';
+    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 
+               request.headers.get('x-real-ip') || 
+               'unknown';
     const limitResult = limiter(ip);
     
     if (!limitResult.allowed) {
