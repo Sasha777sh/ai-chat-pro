@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import OpenAI from 'openai';
+import { rateLimit } from '@/lib/rate-limit';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
@@ -8,8 +9,29 @@ const openaiApiKey = process.env.OPENAI_API_KEY!;
 
 const openai = new OpenAI({ apiKey: openaiApiKey });
 
+// Rate limiter: 30 запросов в минуту на IP
+const limiter = rateLimit({ windowMs: 60 * 1000, max: 30 });
+
 export async function POST(request: NextRequest) {
   try {
+    // Rate limiting
+    const ip = request.ip || request.headers.get('x-forwarded-for') || 'unknown';
+    const limitResult = limiter(ip);
+    
+    if (!limitResult.allowed) {
+      return NextResponse.json(
+        { error: 'Слишком много запросов. Попробуйте позже.' },
+        { 
+          status: 429,
+          headers: {
+            'X-RateLimit-Limit': '30',
+            'X-RateLimit-Remaining': limitResult.remaining.toString(),
+            'X-RateLimit-Reset': new Date(limitResult.resetAt).toISOString(),
+          },
+        }
+      );
+    }
+
     const { sessionId, message } = await request.json();
 
     if (!sessionId || !message) {
@@ -161,11 +183,19 @@ export async function POST(request: NextRequest) {
 
     const aiResponse = completion.choices[0]?.message?.content || 'Ошибка получения ответа';
 
-    return NextResponse.json({ message: aiResponse });
-  } catch (error: any) {
-    console.error('Chat API error:', error);
     return NextResponse.json(
-      { error: error.message || 'Ошибка сервера' },
+      { message: aiResponse },
+      {
+        headers: {
+          'X-RateLimit-Remaining': limitResult.remaining.toString(),
+        },
+      }
+    );
+  } catch (error: unknown) {
+    console.error('Chat API error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Ошибка сервера';
+    return NextResponse.json(
+      { error: errorMessage },
       { status: 500 }
     );
   }

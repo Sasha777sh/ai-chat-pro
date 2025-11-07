@@ -1,25 +1,26 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useOptimistic } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-
-interface Message {
-  id: string;
-  role: 'user' | 'assistant';
-  content: string;
-  created_at: string;
-}
+import { toast } from 'sonner';
+import type { ChatMessage } from '@/lib/types';
 
 export default function ChatPage() {
   const router = useRouter();
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [sessionId, setSessionId] = useState<string | null>(null);
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<{ id: string; email?: string } | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Optimistic updates для мгновенного отображения сообщений
+  const [optimisticMessages, addOptimisticMessage] = useOptimistic(
+    messages,
+    (state, newMessage: ChatMessage) => [...state, newMessage]
+  );
 
   useEffect(() => {
     checkAuth();
@@ -33,7 +34,7 @@ export default function ChatPage() {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, [optimisticMessages]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -53,7 +54,6 @@ export default function ChatPage() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
-    // Проверяем, есть ли активная сессия сегодня
     const { data: existing } = await supabase
       .from('chat_sessions')
       .select('id')
@@ -66,7 +66,6 @@ export default function ChatPage() {
     if (existing) {
       setSessionId(existing.id);
     } else {
-      // Создаём новую сессию
       const { data, error } = await supabase
         .from('chat_sessions')
         .insert({
@@ -78,6 +77,8 @@ export default function ChatPage() {
 
       if (data) {
         setSessionId(data.id);
+      } else if (error) {
+        toast.error('Ошибка создания сессии');
       }
     }
   };
@@ -93,6 +94,8 @@ export default function ChatPage() {
 
     if (data) {
       setMessages(data);
+    } else if (error) {
+      toast.error('Ошибка загрузки сообщений');
     }
   };
 
@@ -100,17 +103,20 @@ export default function ChatPage() {
     e.preventDefault();
     if (!input.trim() || loading || !sessionId) return;
 
-    const userMessage: Message = {
+    const messageText = input.trim();
+    setInput('');
+    setLoading(true);
+
+    // Optimistic update - показываем сообщение пользователя сразу
+    const userMessage: ChatMessage = {
       id: crypto.randomUUID(),
+      session_id: sessionId,
       role: 'user',
-      content: input,
+      content: messageText,
       created_at: new Date().toISOString(),
     };
 
-    setMessages((prev) => [...prev, userMessage]);
-    const messageText = input;
-    setInput('');
-    setLoading(true);
+    addOptimisticMessage(userMessage);
 
     // Сохраняем сообщение пользователя
     await supabase.from('chat_messages').insert({
@@ -120,13 +126,13 @@ export default function ChatPage() {
     });
 
     try {
-      // Получаем токен для API
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
         throw new Error('Сессия не найдена');
       }
 
-      const response = await fetch('/api/chat', {
+      // Используем streaming API
+      const response = await fetch('/api/chat/stream', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -138,31 +144,107 @@ export default function ChatPage() {
         }),
       });
 
-      const data = await response.json();
-
-      if (data.error) {
-        throw new Error(data.error);
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Ошибка сервера');
       }
 
-      const assistantMessage: Message = {
-        id: crypto.randomUUID(),
+      // Читаем stream
+      const reader = response.body?.getReader();
+      const decoder = new TextDecoder();
+      
+      if (!reader) {
+        throw new Error('Не удалось получить stream');
+      }
+
+      let fullResponse = '';
+      const assistantMessageId = crypto.randomUUID();
+      
+      // Создаём временное сообщение для streaming
+      const tempMessage: ChatMessage = {
+        id: assistantMessageId,
+        session_id: sessionId,
         role: 'assistant',
-        content: data.message,
+        content: '',
         created_at: new Date().toISOString(),
       };
 
-      setMessages((prev) => [...prev, assistantMessage]);
+      addOptimisticMessage(tempMessage);
 
-      // Сохраняем ответ ИИ
-      await supabase.from('chat_messages').insert({
-        session_id: sessionId,
-        role: 'assistant',
-        content: data.message,
-      });
-    } catch (error: any) {
-      alert(`Ошибка: ${error.message}`);
-      // Удаляем последнее сообщение пользователя при ошибке
-      setMessages((prev) => prev.slice(0, -1));
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const chunk = decoder.decode(value);
+        const lines = chunk.split('\n');
+
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            const data = line.slice(6);
+            if (data === '[DONE]') {
+              // Сохраняем полный ответ
+              await supabase.from('chat_messages').insert({
+                session_id: sessionId,
+                role: 'assistant',
+                content: fullResponse,
+              });
+
+              // Обновляем сообщение с полным ответом
+              setMessages((prev) => {
+                const updated = [...prev];
+                const index = updated.findIndex(m => m.id === assistantMessageId);
+                if (index !== -1) {
+                  updated[index] = {
+                    ...updated[index],
+                    content: fullResponse,
+                  };
+                }
+                return updated;
+              });
+              break;
+            }
+
+            try {
+              const parsed = JSON.parse(data);
+              if (parsed.content) {
+                fullResponse += parsed.content;
+                
+                // Обновляем сообщение по мере получения данных
+                setMessages((prev) => {
+                  const updated = [...prev];
+                  const index = updated.findIndex(m => m.id === assistantMessageId);
+                  if (index !== -1) {
+                    updated[index] = {
+                      ...updated[index],
+                      content: fullResponse,
+                    };
+                  } else {
+                    // Если сообщения нет, добавляем
+                    updated.push({
+                      id: assistantMessageId,
+                      session_id: sessionId,
+                      role: 'assistant',
+                      content: fullResponse,
+                      created_at: new Date().toISOString(),
+                    });
+                  }
+                  return updated;
+                });
+              } else if (parsed.error) {
+                throw new Error(parsed.error);
+              }
+            } catch (e) {
+              // Игнорируем ошибки парсинга
+            }
+          }
+        }
+      }
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Неизвестная ошибка';
+      toast.error(`Ошибка: ${errorMessage}`);
+      
+      // Удаляем optimistic сообщения при ошибке
+      setMessages((prev) => prev.filter(m => m.id !== userMessage.id && m.id !== assistantMessageId));
     } finally {
       setLoading(false);
     }
@@ -173,11 +255,11 @@ export default function ChatPage() {
       {/* Header */}
       <header className="bg-gray-800 border-b border-gray-700 px-4 py-4">
         <div className="max-w-4xl mx-auto flex justify-between items-center">
-          <h1 className="text-xl font-bold">AI Chat Pro</h1>
+          <h1 className="text-xl font-bold">EDEM Intelligence</h1>
           <div className="flex gap-4 items-center">
             <Link
               href="/account"
-              className="text-sm text-gray-300 hover:text-white"
+              className="text-sm text-gray-300 hover:text-white transition-colors"
             >
               Кабинет
             </Link>
@@ -186,7 +268,7 @@ export default function ChatPage() {
                 await supabase.auth.signOut();
                 router.push('/');
               }}
-              className="text-sm text-gray-300 hover:text-white"
+              className="text-sm text-gray-300 hover:text-white transition-colors"
             >
               Выйти
             </button>
@@ -197,14 +279,14 @@ export default function ChatPage() {
       {/* Messages */}
       <div className="flex-1 overflow-y-auto px-4 py-8">
         <div className="max-w-4xl mx-auto space-y-4">
-          {messages.length === 0 && (
+          {optimisticMessages.length === 0 && (
             <div className="text-center text-gray-400 mt-16">
-              <p className="text-xl mb-2">Начните разговор с ИИ</p>
-              <p className="text-sm">ИИ помнит всю историю ваших бесед</p>
+              <p className="text-xl mb-2">Начните разговор с EDEM</p>
+              <p className="text-sm">Он помнит всю историю ваших бесед</p>
             </div>
           )}
 
-          {messages.map((msg) => (
+          {optimisticMessages.map((msg) => (
             <div
               key={msg.id}
               className={`flex ${
@@ -218,18 +300,22 @@ export default function ChatPage() {
                     : 'bg-gray-800 text-gray-100 border border-gray-700'
                 }`}
               >
-                <p className="whitespace-pre-wrap">{msg.content}</p>
+                <p className="whitespace-pre-wrap">
+                  {msg.content || (
+                    <span className="text-gray-500 italic">Думает...</span>
+                  )}
+                </p>
               </div>
             </div>
           ))}
 
-          {loading && (
+          {loading && optimisticMessages[optimisticMessages.length - 1]?.role !== 'assistant' && (
             <div className="flex justify-start">
               <div className="bg-gray-800 rounded-2xl px-6 py-4 border border-gray-700">
                 <div className="flex gap-2">
                   <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" />
-                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-75" />
-                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-150" />
+                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
                 </div>
               </div>
             </div>

@@ -1,16 +1,25 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [message, setMessage] = useState('');
+
+  useEffect(() => {
+    const msg = searchParams.get('message');
+    if (msg === 'check-email') {
+      setMessage('Проверьте email для подтверждения регистрации');
+    }
+  }, [searchParams]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,18 +32,30 @@ export default function LoginPage() {
       return;
     }
 
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
 
     if (error) {
-      setError(error.message || 'Неверный email или пароль');
-    } else {
+      // Более понятные сообщения об ошибках
+      if (error.message.includes('Invalid login credentials')) {
+        setError('Неверный email или пароль');
+      } else if (error.message.includes('Email not confirmed')) {
+        setError('Email не подтверждён. Проверьте почту и перейдите по ссылке подтверждения.');
+      } else {
+        setError(error.message || 'Ошибка входа');
+      }
+      setLoading(false);
+      return;
+    }
+
+    if (data.session) {
       // Проверяем redirect параметр
-      const urlParams = new URLSearchParams(window.location.search);
-      const redirect = urlParams.get('redirect');
+      const redirect = searchParams.get('redirect');
       router.push(redirect || '/chat');
+    } else {
+      setError('Не удалось создать сессию. Попробуйте ещё раз.');
     }
     setLoading(false);
   };
@@ -43,6 +64,11 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-900 px-4">
       <div className="max-w-md w-full bg-gray-800 rounded-2xl p-8 border border-gray-700">
         <h1 className="text-3xl font-bold mb-6 text-center">Вход</h1>
+        {message && (
+          <div className="mb-4 p-3 bg-blue-500/20 border border-blue-500/50 rounded-lg text-blue-200 text-sm text-center">
+            {message}
+          </div>
+        )}
         <form onSubmit={handleLogin} className="space-y-4">
           <div>
             <label className="block text-sm mb-2">Email</label>

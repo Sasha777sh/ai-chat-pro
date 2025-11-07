@@ -60,10 +60,11 @@ export default function DemoPage() {
           { role: 'assistant', content: data.response || 'Нет ответа' },
         ]);
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Ошибка соединения';
       setMessages((prev) => [
         ...prev,
-        { role: 'assistant', content: 'Ошибка соединения. Попробуйте позже.' },
+        { role: 'assistant', content: `Ошибка: ${errorMessage}` },
       ]);
     } finally {
       setLoading(false);

@@ -50,14 +50,31 @@ function SignupForm() {
       return;
     }
 
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
+      options: {
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
+      },
     });
 
     if (error) {
       setError(error.message);
-    } else {
+      setLoading(false);
+      return;
+    }
+
+    // Проверяем, требуется ли подтверждение email
+    if (data.user && !data.session) {
+      // Email confirmation required
+      setSuccess(true);
+      setError('');
+      // Показываем сообщение о необходимости подтверждения
+      setTimeout(() => {
+        router.push('/login?message=check-email');
+      }, 3000);
+    } else if (data.session) {
+      // Автоматически залогинен
       setSuccess(true);
       setTimeout(() => {
         router.push('/chat');

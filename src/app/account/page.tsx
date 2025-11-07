@@ -4,11 +4,13 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { toast } from 'sonner';
+import type { User, Profile } from '@/lib/types';
 
 export default function AccountPage() {
   const router = useRouter();
-  const [user, setUser] = useState<any>(null);
-  const [profile, setProfile] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -62,10 +64,11 @@ export default function AccountPage() {
       if (data.url) {
         window.location.href = data.url;
       } else if (data.error) {
-        alert(`Ошибка: ${data.error}`);
+        toast.error(`Ошибка: ${data.error}`);
       }
-    } catch (error: any) {
-      alert(`Ошибка: ${error.message}`);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Неизвестная ошибка';
+      toast.error(`Ошибка: ${errorMessage}`);
     }
   };
 
