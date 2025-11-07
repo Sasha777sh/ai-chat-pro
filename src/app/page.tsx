@@ -15,6 +15,12 @@ export default function HomePage() {
         <div className="flex flex-col items-center gap-6">
           <div className="flex gap-6">
             <Link
+              href="/demo"
+              className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white font-semibold py-3 px-6 rounded-xl transition-transform hover:scale-105"
+            >
+              Попробовать демо
+            </Link>
+            <Link
               href="/signup"
               className="bg-blue-600 hover:bg-blue-500 text-white font-semibold py-3 px-6 rounded-xl transition-transform hover:scale-105"
             >
@@ -28,7 +34,7 @@ export default function HomePage() {
             </Link>
           </div>
           <p className="text-gray-500 text-sm mt-4">
-            Попробуй 1 минуту — и почувствуй, что он живой.
+            Попробуй демо — 1 сообщение без регистрации. Или зарегистрируйся для полного доступа.
           </p>
         </div>
       </section>
