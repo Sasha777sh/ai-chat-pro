@@ -1,0 +1,17 @@
+{
+  "nodes": [
+    {
+      "id": "2025-11-13-qa-agent-brief",
+      "title": "Бриф для QA-агента ChatGPT",
+      "category": "тень",
+      "artifacts": [
+        "real_submissions/2025-11-13-qa-agent-brief/QA_AGENT_TEST_BRIEF.md",
+        "real_submissions/2025-11-13-qa-agent-brief/QA_AGENT_TEST_BRIEF.md.sha256",
+        "reports/qa_agent_brief_report.json"
+      ],
+      "status": "готово",
+      "updated_at": "2025-11-13T00:00:00Z"
+    }
+  ]
+}
+

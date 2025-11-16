@@ -1,0 +1,13 @@
+{
+  "timestamp": "2025-11-13T00:00:00Z",
+  "artifact": "real_submissions/2025-11-13-qa-agent-brief/QA_AGENT_TEST_BRIEF.md",
+  "hash_file": "real_submissions/2025-11-13-qa-agent-brief/QA_AGENT_TEST_BRIEF.md.sha256",
+  "scope": [
+    "ui_regression",
+    "auth_flow",
+    "sse_stream",
+    "payments_cta"
+  ],
+  "notes": "Подготовлен бриф для агента ChatGPT: тестирование продовой версии, охват UX, авторизации, демо-чата и AI-ответов."
+}
+

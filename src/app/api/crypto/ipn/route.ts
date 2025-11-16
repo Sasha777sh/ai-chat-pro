@@ -73,23 +73,42 @@ async function processSuccessfulPayment(data: any) {
             return;
         }
 
+        const planId = data.plan || data.planId || 'pro'; // Получаем план из данных платежа
+        const days = 30; // 1 месяц подписки
+
         // Обновляем профиль пользователя
-        const { error } = await supabase
+        const { error: profileError } = await supabase
             .from('profiles')
             .update({
-                subscription_tier: 'pro',
-                subscription_expires_at: new Date(
-                    Date.now() + 30 * 24 * 60 * 60 * 1000
-                ).toISOString(), // +30 дней
+                subscription_tier: planId,
             })
             .eq('id', user.id);
 
-        if (error) {
-            console.error('IPN: Subscription update error:', error);
-            return;
+        if (profileError) {
+            console.error('IPN: Profile update error:', profileError);
         }
 
-        console.log('IPN: Payment processed successfully for user:', user.id);
+        // Обновляем или создаём запись в billing_subscriptions
+        const { error: billingError } = await supabase
+            .from('billing_subscriptions')
+            .upsert({
+                user_id: user.id,
+                plan: planId,
+                status: 'active',
+                current_period_end: new Date(
+                    Date.now() + days * 24 * 60 * 60 * 1000
+                ).toISOString(),
+            }, {
+                onConflict: 'user_id',
+            });
+
+        if (billingError) {
+            console.error('IPN: Billing update error:', billingError);
+        }
+
+        if (!profileError && !billingError) {
+            console.log(`IPN: Payment processed successfully for user ${user.id}, plan: ${planId}`);
+        }
     } catch (error) {
         console.error('IPN: Error processing payment:', error);
     }

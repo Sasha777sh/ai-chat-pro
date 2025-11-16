@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 import crypto from 'crypto';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 const API_URL = 'https://api.yookassa.ru/v3/payments';
 
@@ -19,31 +20,51 @@ export async function POST(request: NextRequest) {
         }
 
         const token = authHeader.replace('Bearer ', '');
-        const supabase = createClient(supabaseUrl, supabaseServiceKey);
-        const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+        
+        // Для проверки пользовательского токена используем anon key
+        const supabaseAuth = createClient(supabaseUrl, supabaseAnonKey);
+        const { data: { user }, error: authError } = await supabaseAuth.auth.getUser(token);
 
         if (authError || !user) {
-            return NextResponse.json({ error: 'Не авторизован' }, { status: 401 });
+            console.error('Auth error:', authError);
+            return NextResponse.json({ error: authError?.message || 'Не авторизован' }, { status: 401 });
+        }
+        
+        // Для работы с данными используем service role key
+        const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+        const { planId } = await request.json(); // 'basic' | 'plus' | 'pro'
+        
+        if (!planId || !['basic', 'plus', 'pro'].includes(planId)) {
+            return NextResponse.json({ error: 'Неверный тариф' }, { status: 400 });
         }
 
-        const { plan } = await request.json(); // 'month'
-        const amount = '990.00'; // 990₽
-        const description = 'AI Chat Pro - Подписка на месяц';
+        // Цены в рублях
+        const prices: Record<string, { amount: string; description: string }> = {
+            basic: { amount: '1500.00', description: 'EDEM Intelligence - Тариф Basic (1 месяц)' },
+            plus: { amount: '2900.00', description: 'EDEM Intelligence - Тариф Plus (1 месяц)' },
+            pro: { amount: '4900.00', description: 'EDEM Intelligence - Тариф Pro (1 месяц)' },
+        };
+
+        const planInfo = prices[planId];
+        if (!planInfo) {
+            return NextResponse.json({ error: 'Тариф не найден' }, { status: 400 });
+        }
 
         const payload = {
             amount: {
-                value: amount,
+                value: planInfo.amount,
                 currency: 'RUB',
             },
             capture: true,
             confirmation: {
                 type: 'redirect',
-                return_url: `${process.env.NEXT_PUBLIC_APP_URL}/account?success=true`,
+                return_url: `${process.env.NEXT_PUBLIC_APP_URL}/account?success=true&plan=${planId}`,
             },
-            description,
+            description: planInfo.description,
             metadata: {
                 userId: user.id,
-                plan: 'month',
+                plan: planId,
             },
         };
 

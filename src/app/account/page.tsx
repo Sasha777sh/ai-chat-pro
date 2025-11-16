@@ -75,39 +75,33 @@ export default function AccountPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-900">
-        <div className="text-gray-400">Загрузка...</div>
+      <div className="min-h-screen flex items-center justify-center bg-edem-dark">
+        <div className="text-edem-secondary">Загрузка...</div>
       </div>
     );
   }
 
   const isPro = profile?.subscription_tier === 'pro';
-  const expiresAt = profile?.subscription_expires_at
-    ? new Date(profile.subscription_expires_at).toLocaleDateString('ru')
-    : null;
 
   return (
-    <div className="min-h-screen bg-gray-900 px-4 py-16">
+    <div className="min-h-screen bg-edem-dark px-4 py-16">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-4xl font-bold mb-8">Личный кабинет</h1>
+        <h1 className="text-4xl font-bold mb-8 text-edem-main text-glow-edem">Личный кабинет</h1>
 
-        <div className="bg-gray-800 rounded-2xl p-8 border border-gray-700 mb-8">
-          <h2 className="text-2xl font-bold mb-4">Профиль</h2>
-          <div className="space-y-2 text-gray-300">
+        <div className="card-edem mb-8">
+          <h2 className="text-2xl font-bold mb-4 text-edem-main">Профиль</h2>
+          <div className="space-y-2 text-edem-secondary">
             <p><strong>Email:</strong> {user?.email}</p>
-            <p><strong>Тариф:</strong> {isPro ? 'Pro' : 'Free'}</p>
-            {isPro && expiresAt && (
-              <p><strong>Подписка до:</strong> {expiresAt}</p>
-            )}
+            <p><strong>Тариф:</strong> {profile?.subscription_tier || 'free'}</p>
           </div>
         </div>
 
-        <div className="bg-gray-800 rounded-2xl p-8 border border-gray-700 mb-8">
-          <h2 className="text-2xl font-bold mb-4">Тариф</h2>
+        <div className="card-edem mb-8">
+          <h2 className="text-2xl font-bold mb-4 text-edem-main">Тариф</h2>
           {isPro ? (
             <div>
-              <p className="text-gray-300 mb-4">У вас активна подписка Pro</p>
-              <div className="space-y-2 text-gray-300">
+              <p className="text-edem-secondary mb-4">У вас активна подписка Pro</p>
+              <div className="space-y-2 text-edem-secondary">
                 <p>✅ 500 сообщений в месяц</p>
                 <p>✅ Полная история чатов</p>
                 <p>✅ Приоритетная поддержка</p>
@@ -115,8 +109,8 @@ export default function AccountPage() {
             </div>
           ) : (
             <div>
-              <p className="text-gray-300 mb-6">Бесплатный тариф: 10 сообщений в день</p>
-              <p className="text-sm text-gray-400 mb-4">Выберите способ оплаты:</p>
+              <p className="text-edem-secondary mb-6">Бесплатный тариф: 2 бесплатных сообщения</p>
+              <p className="text-sm text-edem-muted mb-4">Выберите способ оплаты:</p>
               <div className="grid md:grid-cols-2 gap-4">
                 <button
                   onClick={() => handleUpgrade('yookassa')}
@@ -135,19 +129,25 @@ export default function AccountPage() {
           )}
         </div>
 
-        <div className="flex gap-4">
+        <div className="flex gap-4 flex-wrap">
           <Link
-            href="/chat"
-            className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-colors"
+            href="/chat/live"
+            className="px-6 py-3 bg-edem-live hover:bg-edem-live/80 text-white font-semibold rounded-xl transition-colors"
           >
             Вернуться в чат
+          </Link>
+          <Link
+            href="/billing"
+            className="px-6 py-3 bg-edem-mirror hover:bg-edem-mirror/80 text-white font-semibold rounded-xl transition-colors"
+          >
+            Тарифы и оплата
           </Link>
           <button
             onClick={async () => {
               await supabase.auth.signOut();
               router.push('/');
             }}
-            className="px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white font-semibold rounded-xl transition-colors"
+            className="px-6 py-3 bg-edem-surface hover:bg-edem-surface/80 text-edem-main font-semibold rounded-xl transition-colors border border-edem-line"
           >
             Выйти
           </button>

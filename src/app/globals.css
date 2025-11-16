@@ -1,8 +1,68 @@
 @import "tailwindcss";
 
-body {
-  background: #111827;
-  color: #ffffff;
+:root {
+  --edem-dark: #0C0C0E;
+  --edem-surface: #1A1A1D;
+  --edem-secondary-bg: #111113;
+  --edem-line: #27272A;
+  --edem-main: #F1F1F2;
+  --edem-secondary: #DCDCDC;
+  --edem-muted: #7A7A7A;
+  --edem-sage: #C1934E;
+  --edem-shadow: #C95B5B;
+  --edem-live: #4EAEC1;
+  --edem-child: #A0D17A;
+  --edem-mirror: #B6A8FF;
 }
 
+@layer base {
+  body {
+    background-color: #0C0C0E;
+    color: #F1F1F2;
+  }
+}
 
+@layer components {
+  .card-edem {
+    background-color: #1A1A1D;
+    border: 1px solid #27272A;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    transition: all 0.25s;
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.4);
+  }
+
+  .card-edem:hover {
+    box-shadow: 0 0 25px rgba(255, 255, 255, 0.08);
+    transform: translateY(-2px);
+  }
+
+  .glow-edem {
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.08);
+  }
+
+  .glow-edem-strong {
+    box-shadow: 0 0 25px rgba(255, 255, 255, 0.12);
+  }
+
+  .inner-shadow-edem {
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.4);
+  }
+
+  .text-glow-edem {
+    text-shadow: 0 0 12px rgba(255, 255, 255, 0.06);
+  }
+
+  .btn-edem {
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    background-color: #1A1A1D;
+    border: 1px solid #27272A;
+    color: #F1F1F2;
+    transition: all 0.25s;
+  }
+
+  .btn-edem:hover {
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.08);
+  }
+}

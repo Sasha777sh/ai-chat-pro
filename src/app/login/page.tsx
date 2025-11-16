@@ -18,6 +18,8 @@ function LoginForm() {
     const msg = searchParams.get('message');
     if (msg === 'check-email') {
       setMessage('Проверьте email для подтверждения регистрации');
+    } else if (msg === 'signup-success') {
+      setMessage('Регистрация успешна. Теперь войдите, чтобы продолжить.');
     }
   }, [searchParams]);
 
@@ -75,51 +77,51 @@ function LoginForm() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-900 px-4">
-      <div className="max-w-md w-full bg-gray-800 rounded-2xl p-8 border border-gray-700">
-        <h1 className="text-3xl font-bold mb-6 text-center">Вход</h1>
+    <div className="min-h-screen flex items-center justify-center bg-edem-dark px-4">
+      <div className="max-w-md w-full card-edem p-8">
+        <h1 className="text-3xl font-bold mb-6 text-center text-edem-main text-glow-edem">Вход</h1>
         {message && (
-          <div className="mb-4 p-3 bg-blue-500/20 border border-blue-500/50 rounded-lg text-blue-200 text-sm text-center">
+          <div className="mb-4 p-3 bg-edem-live/20 border border-edem-live/50 rounded-lg text-edem-live text-sm text-center">
             {message}
           </div>
         )}
         <form onSubmit={handleLogin} className="space-y-4">
           <div>
-            <label className="block text-sm mb-2">Email</label>
+            <label className="block text-sm mb-2 text-edem-secondary">Email</label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-500"
+              className="w-full px-4 py-3 bg-edem-secondary-bg border border-edem-line rounded-lg text-edem-main placeholder:text-edem-muted focus:outline-none focus:border-edem-live"
             />
           </div>
           <div>
-            <label className="block text-sm mb-2">Пароль</label>
+            <label className="block text-sm mb-2 text-edem-secondary">Пароль</label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-500"
+              className="w-full px-4 py-3 bg-edem-secondary-bg border border-edem-line rounded-lg text-edem-main placeholder:text-edem-muted focus:outline-none focus:border-edem-live"
             />
           </div>
           {error && (
-            <div className="p-3 bg-red-500/20 border border-red-500/50 rounded-lg text-red-200 text-sm">
+            <div className="p-3 bg-edem-shadow/20 border border-edem-shadow/50 rounded-lg text-edem-shadow text-sm">
               {error}
             </div>
           )}
           <button
             type="submit"
             disabled={loading}
-            className="w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-700 text-white font-semibold rounded-lg transition-colors"
+            className="w-full px-6 py-3 bg-edem-live hover:bg-edem-live/80 disabled:bg-edem-surface disabled:text-edem-muted text-white font-semibold rounded-lg transition-colors"
           >
             {loading ? 'Вход...' : 'Войти'}
           </button>
         </form>
-        <p className="mt-6 text-center text-gray-400">
+        <p className="mt-6 text-center text-edem-muted">
           Нет аккаунта?{' '}
-          <Link href="/signup" className="text-blue-400 hover:text-blue-300">
+          <Link href="/signup" className="text-edem-live hover:text-edem-live/80">
             Зарегистрироваться
           </Link>
         </p>
@@ -131,8 +133,8 @@ function LoginForm() {
 export default function LoginPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center bg-gray-900 px-4">
-        <div className="text-gray-400">Загрузка...</div>
+      <div className="min-h-screen flex items-center justify-center bg-edem-dark px-4">
+        <div className="text-edem-secondary">Загрузка...</div>
       </div>
     }>
       <LoginForm />

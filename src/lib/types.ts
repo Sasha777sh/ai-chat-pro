@@ -1,5 +1,3 @@
-// Типы для приложения
-
 export interface User {
   id: string;
   email?: string;
@@ -7,42 +5,40 @@ export interface User {
 
 export interface Profile {
   id: string;
-  email: string | null;
-  subscription_tier: 'free' | 'pro';
-  subscription_expires_at: string | null;
-  created_at: string;
-  updated_at: string;
+  email?: string;
+  subscription_tier: SubscriptionTier;
+  created_at?: string;
+  updated_at?: string;
 }
+
+export type SubscriptionTier = 'free' | 'basic' | 'plus' | 'pro';
 
 export interface ChatSession {
   id: string;
   user_id: string;
   title: string;
-  created_at: string;
-  updated_at: string;
+  voice_id: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface ChatMessage {
   id: string;
   session_id: string;
-  role: 'user' | 'assistant' | 'ai';
+  role: 'user' | 'assistant';
   content: string;
-  created_at: string;
+  created_at?: string;
 }
 
 export interface ApiError {
   error: string;
-  status?: number;
 }
 
 export interface ChatResponse {
-  message?: string;
-  error?: string;
+  content: string;
 }
 
 export interface StreamChunk {
   content?: string;
   error?: string;
-  done?: boolean;
 }
-

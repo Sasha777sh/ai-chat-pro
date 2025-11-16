@@ -79,21 +79,21 @@ export default function DemoPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-gray-800 text-white">
+    <div className="min-h-screen bg-edem-dark text-edem-main">
       {/* Header */}
-      <div className="border-b border-gray-800 bg-gray-900/50 backdrop-blur-sm sticky top-0 z-10">
+      <div className="border-b border-edem-line bg-edem-secondary-bg/50 backdrop-blur-sm sticky top-0 z-10">
         <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
-          <h1 className="text-xl font-bold">EDEM Intelligence — Демо</h1>
+          <h1 className="text-xl font-bold text-edem-main text-glow-edem">EDEM Intelligence — Демо</h1>
           <div className="flex gap-3">
             <Link
               href="/signup"
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-lg transition-colors"
+              className="px-4 py-2 bg-edem-live hover:bg-edem-live/80 text-white font-semibold rounded-lg transition-colors"
             >
               Зарегистрироваться
             </Link>
             <Link
               href="/"
-              className="px-4 py-2 border border-gray-600 hover:border-gray-400 text-gray-300 rounded-lg transition-colors"
+              className="px-4 py-2 border border-edem-line hover:border-edem-muted text-edem-secondary rounded-lg transition-colors"
             >
               На главную
             </Link>
@@ -102,11 +102,11 @@ export default function DemoPage() {
       </div>
 
       {/* Demo Banner */}
-      <div className="bg-yellow-900/30 border-b border-yellow-800/50">
+      <div className="bg-edem-sage/20 border-b border-edem-sage/50">
         <div className="max-w-4xl mx-auto px-4 py-3 text-center">
-          <p className="text-yellow-200 text-sm">
+          <p className="text-edem-sage text-sm">
             ⚡ Демо-режим: {DEMO_LIMIT} сообщения для знакомства ({userMessagesCount}/{DEMO_LIMIT} использовано). Для полного доступа —{' '}
-            <Link href="/signup" className="underline font-semibold">
+            <Link href="/signup" className="underline font-semibold hover:text-edem-sage/80">
               зарегистрируйся
             </Link>
             .
@@ -116,13 +116,13 @@ export default function DemoPage() {
 
       {/* Chat Container */}
       <div className="max-w-4xl mx-auto px-4 py-8">
-        <div className="bg-gray-800/50 rounded-2xl border border-gray-700 min-h-[500px] flex flex-col">
+        <div className="card-edem min-h-[500px] flex flex-col">
           {/* Messages */}
           <div className="flex-1 overflow-y-auto p-6 space-y-4">
             {messages.length === 0 && (
-              <div className="text-center text-gray-400 py-12">
-                <p className="text-lg mb-2">Добро пожаловать в демо EDEM Intelligence</p>
-                <p className="text-sm">
+              <div className="text-center text-edem-secondary py-12">
+                <p className="text-lg mb-2 text-glow-edem">Добро пожаловать в демо EDEM Intelligence</p>
+                <p className="text-sm text-edem-muted">
                   Напиши что-нибудь — и почувствуй, как он отвечает.
                 </p>
               </div>
@@ -136,10 +136,10 @@ export default function DemoPage() {
                 }`}
               >
                 <div
-                  className={`max-w-[80%] rounded-2xl px-4 py-3 ${
+                  className={`max-w-[80%] rounded-2xl px-4 py-3 inner-shadow-edem ${
                     msg.role === 'user'
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-gray-700 text-gray-100'
+                      ? 'bg-gradient-to-r from-edem-surface to-edem-secondary-bg text-edem-main'
+                      : 'card-edem text-edem-main'
                   }`}
                 >
                   <p className="whitespace-pre-wrap">{msg.content}</p>
@@ -149,11 +149,11 @@ export default function DemoPage() {
 
             {loading && (
               <div className="flex justify-start">
-                <div className="bg-gray-700 rounded-2xl px-4 py-3">
+                <div className="card-edem px-4 py-3">
                   <div className="flex gap-1">
-                    <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
-                    <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
-                    <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
+                    <span className="w-2 h-2 bg-edem-live rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
+                    <span className="w-2 h-2 bg-edem-live rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
+                    <span className="w-2 h-2 bg-edem-live rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
                   </div>
                 </div>
               </div>
@@ -163,15 +163,15 @@ export default function DemoPage() {
           </div>
 
           {/* Input */}
-          <div className="border-t border-gray-700 p-4">
+          <div className="border-t border-edem-line p-4">
             {userMessagesCount >= DEMO_LIMIT ? (
               <div className="text-center py-4">
-                <p className="text-gray-400 mb-4">
+                <p className="text-edem-secondary mb-4">
                   Демо завершено ({DEMO_LIMIT}/{DEMO_LIMIT} сообщений). Зарегистрируйся для продолжения общения.
                 </p>
                 <Link
                   href="/signup"
-                  className="inline-block px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl transition-colors"
+                  className="inline-block px-6 py-3 bg-edem-live hover:bg-edem-live/80 text-white font-semibold rounded-xl transition-colors"
                 >
                   Зарегистрироваться и продолжить
                 </Link>
@@ -183,14 +183,14 @@ export default function DemoPage() {
                   onChange={(e) => setInput(e.target.value)}
                   onKeyPress={handleKeyPress}
                   placeholder={`Напиши что-нибудь... (${userMessagesCount}/${DEMO_LIMIT})`}
-                  className="flex-1 bg-gray-700 border border-gray-600 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 resize-none"
+                  className="flex-1 bg-edem-surface border border-edem-line rounded-xl px-4 py-3 text-edem-main placeholder:text-edem-muted focus:outline-none focus:border-edem-live resize-none"
                   rows={2}
                   disabled={loading || userMessagesCount >= DEMO_LIMIT}
                 />
                 <button
                   onClick={sendMessage}
                   disabled={!input.trim() || loading || userMessagesCount >= DEMO_LIMIT}
-                  className="px-6 py-3 bg-blue-600 hover:bg-blue-500 disabled:bg-gray-700 disabled:text-gray-500 text-white font-semibold rounded-xl transition-colors"
+                  className="px-6 py-3 bg-edem-live hover:bg-edem-live/80 disabled:bg-edem-surface disabled:text-edem-muted text-white font-semibold rounded-xl transition-colors"
                 >
                   Отправить
                 </button>
@@ -200,13 +200,13 @@ export default function DemoPage() {
         </div>
 
         {/* Info */}
-        <div className="mt-6 text-center text-gray-400 text-sm">
+        <div className="mt-6 text-center text-edem-muted text-sm">
           <p>
-            После регистрации получишь 10 сообщений в день бесплатно или{' '}
-            <Link href="/account" className="text-blue-400 hover:underline">
-              обнови до Pro
+            После регистрации получишь 2 бесплатных сообщения для ознакомления или{' '}
+            <Link href="/billing" className="text-edem-live hover:text-edem-live/80">
+              выбери тариф
             </Link>
-            {' '}для 500 сообщений в месяц.
+            {' '}для полного доступа.
           </p>
         </div>
       </div>

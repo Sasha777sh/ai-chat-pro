@@ -1,0 +1,18 @@
+{
+  "summary": {
+    "date": "2025-11-13",
+    "total_artifacts": 1,
+    "categories": {
+      "тень": 1
+    }
+  },
+  "latest": [
+    {
+      "id": "2025-11-13-qa-agent-brief",
+      "title": "Бриф для QA-агента ChatGPT",
+      "status": "готово",
+      "updated_at": "2025-11-13T00:00:00Z"
+    }
+  ]
+}
+

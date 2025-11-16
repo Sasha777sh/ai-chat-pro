@@ -13,26 +13,43 @@ export async function POST(request: NextRequest) {
 
         if (evt === 'payment.succeeded') {
             const userId = obj.metadata?.userId as string | undefined;
-            const plan = obj.metadata?.plan as 'month' | undefined;
+            const planId = obj.metadata?.plan as 'basic' | 'plus' | 'pro' | undefined;
 
-            if (userId) {
-                const days = plan === 'month' ? 30 : 30; // По умолчанию месяц
+            if (userId && planId && ['basic', 'plus', 'pro'].includes(planId)) {
+                const days = 30; // 1 месяц подписки
 
                 // Обновляем профиль пользователя
-                const { error } = await supabase
+                const { error: profileError } = await supabase
                     .from('profiles')
                     .update({
-                        subscription_tier: 'pro',
-                        subscription_expires_at: new Date(
-                            Date.now() + days * 24 * 60 * 60 * 1000
-                        ).toISOString(),
+                        subscription_tier: planId,
                     })
                     .eq('id', userId);
 
-                if (error) {
-                    console.error('YooKassa webhook error updating profile:', error);
-                } else {
-                    console.log(`YooKassa payment successful for user ${userId}, plan: ${plan}`);
+                if (profileError) {
+                    console.error('YooKassa webhook error updating profile:', profileError);
+                }
+
+                // Обновляем или создаём запись в billing_subscriptions
+                const { error: billingError } = await supabase
+                    .from('billing_subscriptions')
+                    .upsert({
+                        user_id: userId,
+                        plan: planId,
+                        status: 'active',
+                        current_period_end: new Date(
+                            Date.now() + days * 24 * 60 * 60 * 1000
+                        ).toISOString(),
+                    }, {
+                        onConflict: 'user_id',
+                    });
+
+                if (billingError) {
+                    console.error('YooKassa webhook error updating billing:', billingError);
+                }
+
+                if (!profileError && !billingError) {
+                    console.log(`YooKassa payment successful for user ${userId}, plan: ${planId}`);
                 }
             }
         }
