@@ -1,0 +1,9 @@
+# Переменные окружения для импорта в Vercel
+# Скопируй все строки БЕЗ комментариев (строки с #) и импортируй в Vercel
+
+NEXT_PUBLIC_SUPABASE_URL=https://jgnnrdrqzcwnhuuvhlfo.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impnbm5yZHJxemN3bmh1dXZobGZvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU3NjU1NTgsImV4cCI6MjA3MTM0MTU1OH0.BZBBo_yNxr7EQqmiI6toKI8y9BEpSjbFQraCo_h7I4A
+SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impnbm5yZHJxemN3bmh1dXZobGZvIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NTc2NTU1OCwiZXhwIjoyMDcxMzQxNTU4fQ.cmYE8P_vlN_YNjvXI6JqEb7hiheIC5YUe0ptu5rvW0Y
+OPENAI_API_KEY=sk-proj-... (твой API ключ из .env.local)
+NEXT_PUBLIC_APP_URL=https://chatedem.com
+

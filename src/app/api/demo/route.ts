@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@supabase/supabase-js';
 import OpenAI from 'openai';
 
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 const openaiApiKey = process.env.OPENAI_API_KEY!;
 
 const openai = new OpenAI({ apiKey: openaiApiKey });
@@ -13,6 +16,46 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: 'Сообщение обязательно' },
         { status: 400 }
+      );
+    }
+
+    // Проверяем аутентификацию
+    const authHeader = request.headers.get('authorization');
+    if (!authHeader) {
+      return NextResponse.json(
+        { error: 'Не авторизован' },
+        { status: 401 }
+      );
+    }
+
+    const token = authHeader.replace('Bearer ', '').trim();
+    
+    if (!token) {
+      console.error('Empty token');
+      return NextResponse.json(
+        { error: 'Токен не предоставлен' },
+        { status: 401 }
+      );
+    }
+    
+    // Для проверки пользовательского токена используем anon key
+    const supabaseAuth = createClient(supabaseUrl, supabaseAnonKey);
+
+    const { data: { user }, error: authError } = await supabaseAuth.auth.getUser(token);
+
+    if (authError || !user) {
+      console.error('Auth error:', {
+        error: authError,
+        message: authError?.message,
+        tokenLength: token.length,
+        tokenStart: token.substring(0, 20) + '...'
+      });
+      return NextResponse.json(
+        { 
+          error: authError?.message || 'Не авторизован',
+          details: process.env.NODE_ENV === 'development' ? authError : undefined
+        },
+        { status: 401 }
       );
     }
 

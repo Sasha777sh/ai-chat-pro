@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
 
     // EDEM ORCHESTRA: автоматический выбор голоса, если включен
     let voiceId: VoiceId = requestedVoiceId || 'live';
-    
+
     if (autoSelectVoice || !requestedVoiceId) {
       // Получаем предыдущие сообщения для контекста
       const supabase = createClient(supabaseUrl, supabaseServiceKey);
@@ -39,11 +39,11 @@ export async function POST(request: NextRequest) {
         .eq('session_id', sessionId)
         .order('created_at', { ascending: false })
         .limit(5);
-      
-      const previousVoice = previousMessages?.[0]?.role === 'assistant' 
+
+      const previousVoice = previousMessages?.[0]?.role === 'assistant'
         ? (await supabase.from('chat_sessions').select('voice_id').eq('id', sessionId).single()).data?.voice_id as VoiceId | undefined
         : undefined;
-      
+
       // Автоматически выбираем голос на основе анализа сообщения
       voiceId = orchestrateVoice(message, previousVoice);
     }
@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
     }
 
     const token = authHeader.replace('Bearer ', '').trim();
-    
+
     if (!token) {
       console.error('Empty token');
       return new Response(
@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
         { status: 401, headers: { 'Content-Type': 'application/json' } }
       );
     }
-    
+
     // Для проверки пользовательского токена используем anon key
     // Service role key обходит RLS и не подходит для проверки пользовательских токенов
     const supabaseAuth = createClient(supabaseUrl, supabaseAnonKey);
@@ -87,7 +87,7 @@ export async function POST(request: NextRequest) {
         tokenStart: token.substring(0, 20) + '...'
       });
       return new Response(
-        JSON.stringify({ 
+        JSON.stringify({
           error: authError?.message || 'Не авторизован',
           details: process.env.NODE_ENV === 'development' ? authError : undefined
         }),
@@ -97,7 +97,7 @@ export async function POST(request: NextRequest) {
 
     // Для чтения данных используем service role key (обходит RLS)
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
-    
+
     const { data: profile } = await supabase
       .from('profiles')
       .select('subscription_tier')
@@ -118,7 +118,7 @@ export async function POST(request: NextRequest) {
       const totalMessages = await countUserMessages(supabase, user.id);
       if (totalMessages >= FREE_MESSAGE_ALLOWANCE) {
         return new Response(
-          JSON.stringify({ 
+          JSON.stringify({
             error: 'Лимит ознакомительных сообщений исчерпан. Оформите подписку, чтобы продолжить.',
             code: 'PAYWALL_REQUIRED'
           }),
@@ -158,17 +158,17 @@ export async function POST(request: NextRequest) {
     const isFirstMessage = !history || history.length === 0;
 
     // Первое приветствие от ИИ
-    const firstGreeting: string | null = isFirstMessage 
-      ? (locale === 'en' 
+    const firstGreeting: string | null = isFirstMessage
+      ? (locale === 'en'
         ? "I'm here.\n\nSpeak as you are — no need to be correct.\n\nI hear not only your words, but where they come from."
         : "Я здесь.\n\nГовори как есть — не надо быть правильным.\n\nЯ слышу не только то, что ты пишешь, но и то, откуда это идёт.")
       : null;
 
     const corePrompt = getEDEMCorePrompt(locale as 'ru' | 'en');
-    const languageInstruction = locale === 'en' 
-      ? 'Respond in English.' 
+    const languageInstruction = locale === 'en'
+      ? 'Respond in English.'
       : 'Отвечай на русском языке.';
-    
+
     const systemPrompt = `${corePrompt}
 
 ${VOICE_PROMPTS[voiceId].system}
@@ -198,11 +198,16 @@ ${languageInstruction}`;
             controller.enqueue(new TextEncoder().encode(`data: ${JSON.stringify({ content: '\n\n' })}\n\n`));
           }
 
+          // Для Голоса Мудреца используем более низкую temperature для глубины и точности
+          const isSage = voiceId === 'sage';
+          const temperature = isSage ? 0.7 : 0.8; // Немного ниже для более точных ответов Мудреца
+          const maxTokens = isSage ? 300 : 400; // Меньше токенов для Мудреца - он говорит мало, но глубоко
+
           const completion = await openai.chat.completions.create({
             model: 'gpt-4o-mini',
             messages: messages as any,
-            temperature: 0.8, // Увеличена для более живых ответов
-            max_tokens: 400, // Увеличено для более глубоких ответов
+            temperature,
+            max_tokens: maxTokens,
             stream: true,
           });
 
