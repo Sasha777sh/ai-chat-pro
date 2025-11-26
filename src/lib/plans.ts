@@ -14,7 +14,7 @@ export interface PlanConfig {
   highlight?: boolean;
 }
 
-export const FREE_MESSAGE_LIMIT = 2;
+export const FREE_MESSAGE_LIMIT = 5;
 
 export const PLAN_CONFIG: Record<PlanId, PlanConfig> = {
   free: {
@@ -22,11 +22,11 @@ export const PLAN_CONFIG: Record<PlanId, PlanConfig> = {
     name: 'Free',
     priceLabel: '$0',
     priceMonthly: 0,
-    description: '2 сообщения для знакомства',
+    description: '5 сообщений для знакомства',
     includedVoices: ['live'],
     features: [
       'Доступ к голосу Живого',
-      'Лимит 2 сообщения',
+      'Лимит 5 сообщений',
       'История текущей сессии',
     ],
   },

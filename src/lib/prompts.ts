@@ -308,4 +308,4 @@ export const SUBSCRIPTION_ACCESS: Record<SubscriptionTier, VoiceId[]> = {
    pro: ['live', 'shadow'],
 };
 
-export const FREE_MESSAGE_ALLOWANCE = 2;
+export const FREE_MESSAGE_ALLOWANCE = 5;

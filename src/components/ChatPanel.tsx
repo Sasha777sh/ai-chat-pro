@@ -24,7 +24,7 @@ export default function ChatPanel({
   lang,
   onSend,
   freeMessagesCount = 0,
-  freeMessagesLimit = 2,
+  freeMessagesLimit = 5,
   onLimitReached,
 }: ChatPanelProps) {
   const [messages, setMessages] = useState<Message[]>([]);
