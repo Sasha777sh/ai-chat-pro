@@ -51,10 +51,53 @@ export async function POST(request: Request) {
     });
 
     if (createError) {
-      return NextResponse.json({ error: createError.message }, { status: 400 });
+      console.error('User creation error:', createError);
+      // Более понятные сообщения об ошибках
+      if (createError.message.includes('already registered') || createError.message.includes('already exists')) {
+        return NextResponse.json({ error: 'Пользователь с таким email уже существует' }, { status: 409 });
+      }
+      if (createError.message.includes('Invalid API key') || createError.message.includes('invalid')) {
+        return NextResponse.json({ 
+          error: 'Ошибка конфигурации сервера. Обратитесь в поддержку.',
+          details: process.env.NODE_ENV === 'development' ? createError.message : undefined
+        }, { status: 500 });
+      }
+      return NextResponse.json({ 
+        error: createError.message || 'Не удалось создать пользователя',
+        details: process.env.NODE_ENV === 'development' ? createError : undefined
+      }, { status: 400 });
     }
 
-    return NextResponse.json({ success: true, userId: createdUser.user?.id });
+    if (!createdUser?.user?.id) {
+      console.error('User created but no user ID returned');
+      return NextResponse.json({ error: 'Пользователь создан, но не удалось получить ID' }, { status: 500 });
+    }
+
+    // Явно создаём профиль (на случай, если триггер не сработал)
+    const { error: profileCreateError } = await supabaseAdmin
+      .from('profiles')
+      .upsert(
+        {
+          id: createdUser.user.id,
+          email: trimmedEmail,
+          subscription_tier: 'free',
+        },
+        {
+          onConflict: 'id',
+        }
+      );
+
+    if (profileCreateError) {
+      console.error('Profile creation error:', profileCreateError);
+      // Не возвращаем ошибку, т.к. пользователь уже создан, профиль может быть создан триггером
+      // Но логируем для отладки
+    }
+
+    return NextResponse.json({ 
+      success: true, 
+      userId: createdUser.user.id,
+      email: trimmedEmail
+    });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Неизвестная ошибка';
     return NextResponse.json({ error: message }, { status: 500 });

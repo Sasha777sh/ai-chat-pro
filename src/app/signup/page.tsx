@@ -65,36 +65,69 @@ function SignupForm() {
     const result = await response.json();
 
     if (!response.ok) {
-      console.error('Signup error:', result.error);
-      setError(result.error || 'Не удалось создать пользователя');
+      console.error('Signup error:', result);
+      // Более понятные сообщения об ошибках
+      let errorMessage = result.error || 'Не удалось создать пользователя';
+      
+      if (result.error?.includes('already exists') || result.error?.includes('уже существует')) {
+        errorMessage = 'Пользователь с таким email уже зарегистрирован. Попробуйте войти.';
+      } else if (result.error?.includes('Invalid API key') || result.error?.includes('конфигурации')) {
+        errorMessage = 'Ошибка сервера. Пожалуйста, попробуйте позже или обратитесь в поддержку.';
+      }
+      
+      setError(errorMessage);
       setLoading(false);
       return;
     }
 
-    console.log('Signup success via admin route');
+    console.log('Signup success via admin route, userId:', result.userId);
 
-    const { data, error: signInError } = await supabase.auth.signInWithPassword({
-      email: trimmedEmail,
-      password,
-    });
+    // Небольшая задержка перед автоматическим входом (даём время на создание профиля)
+    await new Promise(resolve => setTimeout(resolve, 500));
 
-    if (signInError) {
-      console.error('Auto-login error:', signInError);
-      setError(signInError.message || 'Не удалось войти автоматически. Попробуйте войти вручную.');
-      setLoading(false);
-      return;
+    // Пробуем автоматический вход
+    let signInAttempts = 0;
+    const maxAttempts = 3;
+    let signInSuccess = false;
+
+    while (signInAttempts < maxAttempts && !signInSuccess) {
+      signInAttempts++;
+      console.log(`Auto-login attempt ${signInAttempts}/${maxAttempts}`);
+
+      const { data, error: signInError } = await supabase.auth.signInWithPassword({
+        email: trimmedEmail,
+        password,
+      });
+
+      if (signInError) {
+        console.error(`Auto-login error (attempt ${signInAttempts}):`, signInError);
+        
+        // Если это последняя попытка, показываем ошибку
+        if (signInAttempts >= maxAttempts) {
+          // Не показываем ошибку, просто редиректим на логин с сообщением
+          router.push('/login?message=signup-success');
+          setLoading(false);
+          return;
+        }
+        
+        // Ждём перед следующей попыткой
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        continue;
+      }
+
+      if (data.session) {
+        console.log('Auto-login successful. Redirecting to welcome.');
+        localStorage.setItem('onboarding_completed', 'false');
+        router.push('/welcome');
+        signInSuccess = true;
+        setLoading(false);
+        return;
+      }
     }
 
-    if (data.session) {
-      console.log('Auto-login successful. Redirecting to welcome.');
-      localStorage.setItem('onboarding_completed', 'false');
-      router.push('/welcome');
-      setLoading(false);
-      return;
-    }
-
-    console.error('No session after auto-login attempt');
-    setError('Не удалось установить сессию. Попробуйте войти вручную.');
+    // Если автоматический вход не удался, редиректим на логин
+    console.log('Auto-login failed after all attempts. Redirecting to login.');
+    router.push('/login?message=signup-success');
     setLoading(false);
   };
 

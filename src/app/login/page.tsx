@@ -34,20 +34,24 @@ function LoginForm() {
       return;
     }
 
+    const trimmedEmail = email.trim().toLowerCase();
+    
     const { data, error } = await supabase.auth.signInWithPassword({
-      email,
+      email: trimmedEmail,
       password,
     });
 
     if (error) {
       console.error('Login error:', error);
       // Более понятные сообщения об ошибках
-      if (error.message.includes('Invalid login credentials')) {
+      if (error.message.includes('Invalid login credentials') || error.message.includes('Invalid')) {
         setError('Неверный email или пароль. Проверьте правильность введённых данных.');
       } else if (error.message.includes('Email not confirmed') || error.message.includes('email_not_confirmed')) {
         setError('Email не подтверждён. Проверьте почту и перейдите по ссылке подтверждения.');
+      } else if (error.message.includes('Invalid API key') || error.message.includes('invalid')) {
+        setError('Ошибка сервера. Пожалуйста, попробуйте позже или обратитесь в поддержку.');
       } else {
-        setError(error.message || 'Ошибка входа');
+        setError(error.message || 'Ошибка входа. Попробуйте ещё раз.');
       }
       setLoading(false);
       return;
