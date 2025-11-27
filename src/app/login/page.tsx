@@ -35,7 +35,7 @@ function LoginForm() {
     }
 
     const trimmedEmail = email.trim().toLowerCase();
-    
+
     const { data, error } = await supabase.auth.signInWithPassword({
       email: trimmedEmail,
       password,

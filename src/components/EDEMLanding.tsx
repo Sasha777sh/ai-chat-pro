@@ -60,14 +60,14 @@ export default function EDEMLanding() {
         </nav>
       </header>
 
-      <main className="relative z-10 max-w-6xl mx-auto px-6 py-12">
+      <main className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
         {/* HERO */}
         <section className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div className="space-y-6">
             <div className="inline-block px-4 py-1.5 rounded-full bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/20 text-amber-400 text-sm font-medium mb-4">
               ✨ Живой ИИ нового поколения
             </div>
-            <h2 className="text-5xl lg:text-6xl font-black leading-tight bg-gradient-to-r from-gray-100 via-gray-200 to-gray-300 bg-clip-text text-transparent">
+            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black leading-tight bg-gradient-to-r from-gray-100 via-gray-200 to-gray-300 bg-clip-text text-transparent">
               Это не терапия.
               <br />
               <span className="bg-gradient-to-r from-amber-400 via-orange-400 to-amber-500 bg-clip-text text-transparent">
@@ -80,13 +80,18 @@ export default function EDEMLanding() {
 
             <div className="mt-8 flex flex-wrap gap-4">
               {!testModeUsed ? (
-                <button
-                  onClick={handleTestMode}
-                  className="group relative px-8 py-4 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 text-black font-bold hover:from-amber-300 hover:to-orange-400 transition-all duration-300 shadow-lg shadow-amber-500/30 hover:shadow-amber-500/50 hover:scale-105"
-                >
-                  <span className="relative z-10">✨ Попробовать без регистрации</span>
-                  <div className="absolute inset-0 rounded-full bg-gradient-to-r from-amber-500 to-orange-600 opacity-0 group-hover:opacity-100 blur-xl transition-opacity"></div>
-                </button>
+                <div className="flex flex-col items-start gap-2">
+                  <button
+                    onClick={handleTestMode}
+                    className="group relative px-8 py-4 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 text-black font-bold hover:from-amber-300 hover:to-orange-400 transition-all duration-300 shadow-lg shadow-amber-500/30 hover:shadow-amber-500/50 hover:scale-105"
+                  >
+                    <span className="relative z-10">✨ Попробовать без регистрации</span>
+                    <div className="absolute inset-0 rounded-full bg-gradient-to-r from-amber-500 to-orange-600 opacity-0 group-hover:opacity-100 blur-xl transition-opacity"></div>
+                  </button>
+                  <p className="text-xs text-gray-400 ml-2">
+                    5 сообщений • Без регистрации • Одноразово
+                  </p>
+                </div>
               ) : (
                 <Link
                   href="/login"

@@ -75,12 +75,22 @@ export default function TestModePage() {
           setTestModeUsed(true);
           setMessages((prev) => [
             ...prev,
-            { role: 'assistant', content: 'Тестовый режим уже использован. Зарегистрируйтесь для продолжения общения.' },
+            { role: 'assistant', content: 'Тестовый режим уже использован. Зарегистрируйтесь для продолжения общения с EDEM.' },
           ]);
         } else {
+          // Улучшенные сообщения об ошибках
+          let errorMessage = data.error;
+          if (data.error.includes('соединен') || data.error.includes('network') || data.error.includes('fetch')) {
+            errorMessage = 'Проблема с соединением. Проверь интернет и попробуй ещё раз.';
+          } else if (data.error.includes('timeout') || data.error.includes('таймаут')) {
+            errorMessage = 'Ответ занимает больше времени, чем обычно. Попробуй ещё раз.';
+          } else if (data.error.includes('сервер') || data.error.includes('server')) {
+            errorMessage = 'Временная проблема на сервере. Попробуй через минуту.';
+          }
+          
           setMessages((prev) => [
             ...prev,
-            { role: 'assistant', content: `Ошибка: ${data.error}` },
+            { role: 'assistant', content: `⚠️ ${errorMessage}` },
           ]);
         }
       } else {
@@ -96,9 +106,17 @@ export default function TestModePage() {
       }
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'Ошибка соединения';
+      let friendlyMessage = 'Проблема с соединением. Проверь интернет и попробуй ещё раз.';
+      
+      if (errorMessage.includes('Failed to fetch') || errorMessage.includes('NetworkError')) {
+        friendlyMessage = 'Нет соединения с сервером. Проверь интернет и попробуй ещё раз.';
+      } else if (errorMessage.includes('timeout')) {
+        friendlyMessage = 'Ответ занимает больше времени, чем обычно. Попробуй ещё раз.';
+      }
+      
       setMessages((prev) => [
         ...prev,
-        { role: 'assistant', content: `Ошибка: ${errorMessage}` },
+        { role: 'assistant', content: `⚠️ ${friendlyMessage}` },
       ]);
     } finally {
       setLoading(false);
@@ -183,12 +201,37 @@ export default function TestModePage() {
           {/* Messages */}
           <div className="flex-1 overflow-y-auto p-6 space-y-4">
             {messages.length === 0 && (
-              <div className="text-center text-gray-400 py-12">
+              <div className="text-center text-gray-400 py-12 space-y-6">
                 <div className="text-5xl mb-4">✨</div>
-                <p className="text-lg mb-2 font-semibold">Добро пожаловать в тестовый режим EDEM</p>
-                <p className="text-sm">
-                  Напиши что-нибудь — и почувствуй, как он отвечает. У тебя {TEST_LIMIT} сообщений.
-                </p>
+                <div className="space-y-3">
+                  <p className="text-lg mb-2 font-semibold text-gray-200">Добро пожаловать в тестовый режим EDEM</p>
+                  <p className="text-sm max-w-md mx-auto">
+                    Напиши что-нибудь — и почувствуй, как он отвечает. У тебя {TEST_LIMIT} сообщений.
+                  </p>
+                </div>
+                
+                {/* Подсказки для новых пользователей */}
+                <div className="mt-8 max-w-lg mx-auto space-y-3 text-left">
+                  <div className="bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/20 rounded-xl p-4">
+                    <p className="text-xs font-semibold text-amber-400 mb-2">💡 Как это работает:</p>
+                    <ul className="text-xs text-gray-300 space-y-1.5">
+                      <li>• Напиши о своём состоянии, чувствах, вопросах</li>
+                      <li>• ИИ ответит в стиле "Голоса Живого" — мягко и глубоко</li>
+                      <li>• Он адаптируется под твоё эмоциональное состояние</li>
+                      <li>• После {TEST_LIMIT} сообщений зарегистрируйся для продолжения</li>
+                    </ul>
+                  </div>
+                  
+                  <div className="bg-gradient-to-r from-gray-800/40 to-gray-900/40 border border-white/5 rounded-xl p-4">
+                    <p className="text-xs font-semibold text-gray-300 mb-2">📝 Примеры сообщений:</p>
+                    <ul className="text-xs text-gray-400 space-y-1">
+                      <li>• "Я устал, не знаю что делать"</li>
+                      <li>• "Тревожно, боюсь будущего"</li>
+                      <li>• "Потерялся, не понимаю себя"</li>
+                      <li>• "Расскажи о себе"</li>
+                    </ul>
+                  </div>
+                </div>
               </div>
             )}
 

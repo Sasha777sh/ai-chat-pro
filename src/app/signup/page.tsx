@@ -9,13 +9,13 @@ function SignupForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const plan = searchParams.get('plan');
-  
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  
+
   const validatePassword = (pwd: string): string | null => {
     if (pwd.length < 8) {
       return 'Пароль должен быть не менее 8 символов';
@@ -68,13 +68,13 @@ function SignupForm() {
       console.error('Signup error:', result);
       // Более понятные сообщения об ошибках
       let errorMessage = result.error || 'Не удалось создать пользователя';
-      
+
       if (result.error?.includes('already exists') || result.error?.includes('уже существует')) {
         errorMessage = 'Пользователь с таким email уже зарегистрирован. Попробуйте войти.';
       } else if (result.error?.includes('Invalid API key') || result.error?.includes('конфигурации')) {
         errorMessage = 'Ошибка сервера. Пожалуйста, попробуйте позже или обратитесь в поддержку.';
       }
-      
+
       setError(errorMessage);
       setLoading(false);
       return;
@@ -101,7 +101,7 @@ function SignupForm() {
 
       if (signInError) {
         console.error(`Auto-login error (attempt ${signInAttempts}):`, signInError);
-        
+
         // Если это последняя попытка, показываем ошибку
         if (signInAttempts >= maxAttempts) {
           // Не показываем ошибку, просто редиректим на логин с сообщением
@@ -109,7 +109,7 @@ function SignupForm() {
           setLoading(false);
           return;
         }
-        
+
         // Ждём перед следующей попыткой
         await new Promise(resolve => setTimeout(resolve, 1000));
         continue;

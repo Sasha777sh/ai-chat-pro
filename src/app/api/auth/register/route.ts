@@ -57,12 +57,12 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: 'Пользователь с таким email уже существует' }, { status: 409 });
       }
       if (createError.message.includes('Invalid API key') || createError.message.includes('invalid')) {
-        return NextResponse.json({ 
+        return NextResponse.json({
           error: 'Ошибка конфигурации сервера. Обратитесь в поддержку.',
           details: process.env.NODE_ENV === 'development' ? createError.message : undefined
         }, { status: 500 });
       }
-      return NextResponse.json({ 
+      return NextResponse.json({
         error: createError.message || 'Не удалось создать пользователя',
         details: process.env.NODE_ENV === 'development' ? createError : undefined
       }, { status: 400 });
@@ -93,8 +93,8 @@ export async function POST(request: Request) {
       // Но логируем для отладки
     }
 
-    return NextResponse.json({ 
-      success: true, 
+    return NextResponse.json({
+      success: true,
       userId: createdUser.user.id,
       email: trimmedEmail
     });

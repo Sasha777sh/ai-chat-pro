@@ -328,7 +328,18 @@ export default function ChatVoicePage(props: any) {
       if (message.includes('лимит') || message.includes('исчерпан') || message.includes('402')) {
         setShowPaywall(true);
       } else {
-        toast.error(message);
+        // Улучшенные сообщения об ошибках
+        let friendlyMessage = message;
+        if (message.includes('соединен') || message.includes('network') || message.includes('fetch')) {
+          friendlyMessage = 'Проблема с соединением. Проверь интернет и попробуй ещё раз.';
+        } else if (message.includes('timeout') || message.includes('таймаут')) {
+          friendlyMessage = 'Ответ занимает больше времени, чем обычно. Попробуй ещё раз.';
+        } else if (message.includes('сервер') || message.includes('server') || message.includes('500')) {
+          friendlyMessage = 'Временная проблема на сервере. Попробуй через минуту.';
+        } else if (message.includes('401') || message.includes('авториз')) {
+          friendlyMessage = 'Проблема с авторизацией. Выйди и войди снова.';
+        }
+        toast.error(friendlyMessage);
       }
 
       setMessages((prev) => prev.filter((msg) => msg.id !== userMessage.id && msg.id !== assistantMessageId));
