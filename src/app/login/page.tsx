@@ -4,6 +4,7 @@ import { useState, useEffect, Suspense } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import { analytics, trackLogin } from '@/lib/analytics';
 
 function LoginForm() {
   const router = useRouter();
@@ -15,6 +16,9 @@ function LoginForm() {
   const [message, setMessage] = useState('');
 
   useEffect(() => {
+    // Инициализируем аналитику
+    analytics.init();
+    
     const msg = searchParams.get('message');
     if (msg === 'check-email') {
       setMessage('Проверьте email для подтверждения регистрации');
@@ -60,6 +64,9 @@ function LoginForm() {
     console.log('Login data:', { user: data.user?.id, session: !!data.session });
 
     if (data.session) {
+      // Отслеживаем вход
+      trackLogin(trimmedEmail);
+      analytics.identify(data.user?.id || '', { email: trimmedEmail });
       // Проверяем redirect параметр
       const redirect = searchParams.get('redirect');
       if (redirect) {

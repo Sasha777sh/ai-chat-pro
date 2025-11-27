@@ -213,6 +213,9 @@ export default function ChatVoicePage(props: any) {
       content: messageText,
     });
 
+    // Отслеживаем отправку сообщения
+    trackChatMessage(voiceId, messageText.length);
+
     try {
       const {
         data: { session },

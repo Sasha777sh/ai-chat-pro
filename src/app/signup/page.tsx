@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, Suspense } from 'react';
+import { useState, Suspense, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import { analytics, trackRegistration } from '@/lib/analytics';
 
 function SignupForm() {
   const router = useRouter();
@@ -15,6 +16,11 @@ function SignupForm() {
   const [passwordConfirm, setPasswordConfirm] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    // Инициализируем аналитику
+    analytics.init();
+  }, []);
 
   const validatePassword = (pwd: string): string | null => {
     if (pwd.length < 8) {
@@ -81,6 +87,10 @@ function SignupForm() {
     }
 
     console.log('Signup success via admin route, userId:', result.userId);
+
+    // Отслеживаем регистрацию
+    trackRegistration(trimmedEmail);
+    analytics.identify(result.userId, { email: trimmedEmail });
 
     // Небольшая задержка перед автоматическим входом (даём время на создание профиля)
     await new Promise(resolve => setTimeout(resolve, 500));
