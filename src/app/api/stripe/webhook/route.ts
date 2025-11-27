@@ -4,12 +4,17 @@ import Stripe from 'stripe';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-const stripeSecretKey = process.env.STRIPE_SECRET_KEY!;
-const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
-const stripe = new Stripe(stripeSecretKey, {
-  apiVersion: '2025-08-27.basil',
-});
+// Ленивая инициализация Stripe (только при необходимости)
+function getStripe() {
+  const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+  if (!stripeSecretKey) {
+    throw new Error('STRIPE_SECRET_KEY не настроен');
+  }
+  return new Stripe(stripeSecretKey, {
+    apiVersion: '2025-08-27.basil',
+  });
+}
 
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
@@ -21,9 +26,15 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Нет подписи' }, { status: 400 });
   }
 
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+  if (!webhookSecret) {
+    return NextResponse.json({ error: 'STRIPE_WEBHOOK_SECRET не настроен' }, { status: 500 });
+  }
+
   let event: Stripe.Event;
 
   try {
+    const stripe = getStripe();
     event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
   } catch (error: any) {
     console.error('Webhook signature verification failed:', error.message);
@@ -42,6 +53,7 @@ export async function POST(request: NextRequest) {
           break;
         }
 
+        const stripe = getStripe();
         const subscriptionResponse = await stripe.subscriptions.retrieve(session.subscription as string);
         const subscription = subscriptionResponse as Stripe.Subscription & { current_period_end?: number };
 

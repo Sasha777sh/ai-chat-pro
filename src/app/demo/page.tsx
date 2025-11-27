@@ -17,7 +17,7 @@ export default function DemoPage() {
   const [userMessagesCount, setUserMessagesCount] = useState(0);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   
-  const DEMO_LIMIT = 2; // 2 сообщения пользователя
+  const DEMO_LIMIT = 5; // 5 сообщений пользователя
 
   useEffect(() => {
     scrollToBottom();
@@ -202,7 +202,7 @@ export default function DemoPage() {
         {/* Info */}
         <div className="mt-6 text-center text-edem-muted text-sm">
           <p>
-            После регистрации получишь 2 бесплатных сообщения для ознакомления или{' '}
+            После регистрации получишь 5 бесплатных сообщений для ознакомления или{' '}
             <Link href="/billing" className="text-edem-live hover:text-edem-live/80">
               выбери тариф
             </Link>

@@ -454,8 +454,8 @@ export default function ChatVoicePage(props: any) {
               <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                 <div
                   className={`max-w-[80%] rounded-2xl px-6 py-4 inner-shadow-edem ${msg.role === 'user'
-                      ? 'bg-gradient-to-r from-edem-surface to-edem-secondary-bg text-edem-main'
-                      : 'card-edem text-edem-main'
+                    ? 'bg-gradient-to-r from-edem-surface to-edem-secondary-bg text-edem-main'
+                    : 'card-edem text-edem-main'
                     }`}
                   style={
                     msg.role === 'assistant'

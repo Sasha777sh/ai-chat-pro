@@ -5,12 +5,18 @@ import { PLAN_CONFIG, type PlanId } from '@/lib/plans';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-const stripeSecretKey = process.env.STRIPE_SECRET_KEY!;
 const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 
-const stripe = new Stripe(stripeSecretKey, {
-  apiVersion: '2025-08-27.basil',
-});
+// Ленивая инициализация Stripe (только при необходимости)
+function getStripe() {
+  const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+  if (!stripeSecretKey) {
+    throw new Error('STRIPE_SECRET_KEY не настроен');
+  }
+  return new Stripe(stripeSecretKey, {
+    apiVersion: '2025-08-27.basil',
+  });
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -50,6 +56,7 @@ export async function POST(request: NextRequest) {
     let customerId = existingSubscription?.stripe_customer_id;
 
     if (!customerId) {
+      const stripe = getStripe();
       const customer = await stripe.customers.create({
         email: user.email,
         metadata: { userId: user.id },
@@ -64,6 +71,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
+    const stripe = getStripe();
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       mode: 'subscription',
