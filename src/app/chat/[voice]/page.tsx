@@ -214,7 +214,9 @@ export default function ChatVoicePage(props: any) {
     });
 
     // Отслеживаем отправку сообщения
-    trackChatMessage(voiceId, messageText.length);
+    if (user) {
+      trackChatMessage(voiceId, messageText.length);
+    }
 
     try {
       const {
