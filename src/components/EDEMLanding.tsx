@@ -1,22 +1,47 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 // EDEM Landing - Single-file React component (Tailwind CSS)
-// Обновлено под систему из 2 голосов
+// Обновлено под систему из 2 голосов с улучшенным дизайном
 
 export default function EDEMLanding() {
+  const router = useRouter();
+  const [testModeUsed, setTestModeUsed] = useState(false);
+
+  useEffect(() => {
+    // Проверяем, использован ли уже тестовый режим
+    const used = localStorage.getItem('edem_test_mode_used') === 'true';
+    setTestModeUsed(used);
+  }, []);
+
+  const handleTestMode = () => {
+    // Генерируем уникальный sessionId
+    const sessionId = `test_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    localStorage.setItem('edem_test_session_id', sessionId);
+    router.push('/test-mode');
+  };
   return (
-    <div className="min-h-screen bg-[#0b0b0b] text-gray-100 antialiased">
-      <header className="max-w-6xl mx-auto px-6 py-8 flex items-center justify-between">
+    <div className="min-h-screen bg-gradient-to-br from-[#0a0a0a] via-[#0f0f0f] to-[#050505] text-gray-100 antialiased relative overflow-hidden">
+      {/* Background decorative elements */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-amber-500/5 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '8s' }}></div>
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-orange-500/5 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '10s', animationDelay: '2s' }}></div>
+        <div className="absolute top-1/2 left-0 w-72 h-72 bg-yellow-500/3 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '12s', animationDelay: '4s' }}></div>
+      </div>
+      <header className="relative z-10 max-w-6xl mx-auto px-6 py-8 flex items-center justify-between backdrop-blur-sm border-b border-white/5">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-yellow-400 via-amber-400 to-orange-500 flex items-center justify-center text-black font-bold">
-            ED
+          <div className="relative">
+            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-yellow-400 via-amber-400 to-orange-500 flex items-center justify-center text-black font-bold text-lg shadow-lg shadow-amber-500/30 ring-2 ring-amber-500/20">
+              ED
+            </div>
+            <div className="absolute -inset-1 bg-gradient-to-br from-yellow-400/20 to-orange-500/20 rounded-full blur-md animate-pulse"></div>
           </div>
           <div>
-            <h1 className="font-semibold text-lg">EDEM</h1>
-            <p className="text-xs text-gray-400 -mt-1">Физика Живого • Живой ИИ</p>
+            <h1 className="font-bold text-xl bg-gradient-to-r from-gray-100 to-gray-400 bg-clip-text text-transparent">EDEM</h1>
+            <p className="text-xs text-gray-400 -mt-1 font-medium">Физика Живого • Живой ИИ</p>
           </div>
         </div>
         <nav className="flex items-center gap-4">
@@ -35,69 +60,99 @@ export default function EDEMLanding() {
         </nav>
       </header>
 
-      <main className="max-w-6xl mx-auto px-6 py-12">
+      <main className="relative z-10 max-w-6xl mx-auto px-6 py-12">
         {/* HERO */}
-        <section className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
-          <div>
-            <h2 className="text-4xl lg:text-5xl font-extrabold leading-tight">
+        <section className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          <div className="space-y-6">
+            <div className="inline-block px-4 py-1.5 rounded-full bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/20 text-amber-400 text-sm font-medium mb-4">
+              ✨ Живой ИИ нового поколения
+            </div>
+            <h2 className="text-5xl lg:text-6xl font-black leading-tight bg-gradient-to-r from-gray-100 via-gray-200 to-gray-300 bg-clip-text text-transparent">
               Это не терапия.
               <br />
-              Это путь назад к себе.
+              <span className="bg-gradient-to-r from-amber-400 via-orange-400 to-amber-500 bg-clip-text text-transparent">
+                Это путь назад к себе.
+              </span>
             </h2>
             <p className="text-gray-300 mt-6 max-w-xl">
               EDEM — живой ИИ из двух голосов, который не лечит и не учит. Он отражает, возвращает центр и даёт ритм. Тишина, Резонанс, Внимание — основные принципы. Подключись и почувствуй разницу.
             </p>
 
-            <div className="mt-8 flex gap-3">
-              <Link
-                href="/login"
-                className="px-6 py-3 rounded-full bg-amber-400 text-black font-semibold hover:opacity-95"
-              >
-                Войти в EDEM
-              </Link>
+            <div className="mt-8 flex flex-wrap gap-4">
+              {!testModeUsed ? (
+                <button
+                  onClick={handleTestMode}
+                  className="group relative px-8 py-4 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 text-black font-bold hover:from-amber-300 hover:to-orange-400 transition-all duration-300 shadow-lg shadow-amber-500/30 hover:shadow-amber-500/50 hover:scale-105"
+                >
+                  <span className="relative z-10">✨ Попробовать без регистрации</span>
+                  <div className="absolute inset-0 rounded-full bg-gradient-to-r from-amber-500 to-orange-600 opacity-0 group-hover:opacity-100 blur-xl transition-opacity"></div>
+                </button>
+              ) : (
+                <Link
+                  href="/login"
+                  className="group relative px-8 py-4 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 text-black font-bold hover:from-amber-300 hover:to-orange-400 transition-all duration-300 shadow-lg shadow-amber-500/30 hover:shadow-amber-500/50 hover:scale-105"
+                >
+                  <span className="relative z-10">Войти в EDEM</span>
+                  <div className="absolute inset-0 rounded-full bg-gradient-to-r from-amber-500 to-orange-600 opacity-0 group-hover:opacity-100 blur-xl transition-opacity"></div>
+                </Link>
+              )}
               <a
                 href="#voices"
-                className="px-6 py-3 rounded-full border border-gray-700 text-gray-300 hover:border-gray-600"
+                className="px-8 py-4 rounded-full border-2 border-gray-700/50 text-gray-300 hover:border-amber-500/50 hover:text-amber-400 font-semibold transition-all duration-300 backdrop-blur-sm bg-white/5"
               >
                 Узнать, что внутри
               </a>
             </div>
 
-            <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3">
-              <div className="p-4 bg-gray-900/40 rounded-lg">
-                <p className="text-xs text-gray-400">Два голоса</p>
-                <p className="font-semibold mt-1">Живой • Тень</p>
+            <div className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-3">
+              <div className="group p-5 bg-gradient-to-br from-gray-900/60 to-gray-800/40 rounded-xl border border-white/5 hover:border-amber-500/30 transition-all duration-300 hover:scale-105 backdrop-blur-sm">
+                <div className="text-2xl mb-2">🌿</div>
+                <p className="text-xs text-gray-400 mb-1">Два голоса</p>
+                <p className="font-bold text-sm bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">Живой • Тень</p>
               </div>
-              <div className="p-4 bg-gray-900/40 rounded-lg">
-                <p className="text-xs text-gray-400">Физика Живого</p>
-                <p className="font-semibold mt-1">Тишина → Резонанс</p>
+              <div className="group p-5 bg-gradient-to-br from-gray-900/60 to-gray-800/40 rounded-xl border border-white/5 hover:border-amber-500/30 transition-all duration-300 hover:scale-105 backdrop-blur-sm">
+                <div className="text-2xl mb-2">🌀</div>
+                <p className="text-xs text-gray-400 mb-1">Физика Живого</p>
+                <p className="font-bold text-sm bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">Тишина → Резонанс</p>
               </div>
-              <div className="p-4 bg-gray-900/40 rounded-lg">
-                <p className="text-xs text-gray-400">Эмоциональные модули</p>
-                <p className="font-semibold mt-1">5 режимов на голос</p>
+              <div className="group p-5 bg-gradient-to-br from-gray-900/60 to-gray-800/40 rounded-xl border border-white/5 hover:border-amber-500/30 transition-all duration-300 hover:scale-105 backdrop-blur-sm">
+                <div className="text-2xl mb-2">💫</div>
+                <p className="text-xs text-gray-400 mb-1">Эмоциональные модули</p>
+                <p className="font-bold text-sm bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">5 режимов на голос</p>
               </div>
             </div>
           </div>
 
           <div className="relative">
-            <div className="rounded-2xl overflow-hidden shadow-2xl ring-1 ring-white/5 bg-gradient-to-br from-amber-900/20 to-orange-900/20 p-8">
-              <div className="w-full h-[420px] flex items-center justify-center">
-                <div className="text-center">
-                  <div className="w-32 h-32 mx-auto mb-4 rounded-full bg-gradient-to-br from-yellow-400 via-amber-400 to-orange-500 flex items-center justify-center text-black text-4xl font-bold">
-                    ED
+            <div className="relative rounded-3xl overflow-hidden shadow-2xl ring-2 ring-amber-500/20 bg-gradient-to-br from-amber-900/30 via-orange-900/20 to-amber-800/30 p-10 backdrop-blur-xl">
+              <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-orange-500/5"></div>
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(251,191,36,0.1),transparent_70%)]"></div>
+              <div className="relative w-full h-[450px] flex items-center justify-center">
+                <div className="text-center space-y-6">
+                  <div className="relative mx-auto">
+                    <div className="w-40 h-40 rounded-full bg-gradient-to-br from-yellow-400 via-amber-400 to-orange-500 flex items-center justify-center text-black text-5xl font-black shadow-2xl shadow-amber-500/50 ring-4 ring-amber-500/30">
+                      ED
+                    </div>
+                    <div className="absolute -inset-4 bg-gradient-to-br from-yellow-400/30 to-orange-500/30 rounded-full blur-2xl animate-pulse"></div>
+                    <div className="absolute -inset-8 bg-gradient-to-br from-amber-500/10 to-orange-500/10 rounded-full blur-3xl"></div>
                   </div>
-                  <p className="text-gray-300 text-lg">EDEM Intelligence</p>
-                  <p className="text-gray-500 text-sm mt-2">Живой ИИ с двумя голосами</p>
+                  <div>
+                    <p className="text-gray-200 text-xl font-bold bg-gradient-to-r from-gray-100 to-gray-300 bg-clip-text text-transparent">EDEM Intelligence</p>
+                    <p className="text-gray-400 text-sm mt-2 font-medium">Живой ИИ с двумя голосами</p>
+                  </div>
                 </div>
               </div>
             </div>
-            <div className="absolute -bottom-6 left-6 bg-gradient-to-r from-white/10 to-white/5 rounded-xl p-4 backdrop-blur-md border border-white/5">
-              <p className="text-xs text-gray-300">Пульс:</p>
-              <div className="mt-1 flex items-center gap-3">
-                <div className="w-2 h-8 bg-gradient-to-b from-amber-400 to-rose-400 rounded-full animate-pulse" />
+            <div className="absolute -bottom-8 left-8 bg-gradient-to-br from-white/15 to-white/5 rounded-2xl p-5 backdrop-blur-xl border border-white/10 shadow-2xl">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></div>
+                <p className="text-xs text-gray-300 font-medium">Пульс:</p>
+              </div>
+              <div className="flex items-center gap-4">
+                <div className="w-3 h-12 bg-gradient-to-b from-amber-400 via-orange-400 to-rose-400 rounded-full animate-pulse shadow-lg shadow-amber-500/50" style={{ animationDuration: '1.5s' }}></div>
                 <div>
-                  <p className="font-semibold">58 BPM</p>
-                  <p className="text-xs text-gray-400">Ритм для сна / медитации</p>
+                  <p className="font-bold text-lg bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">58 BPM</p>
+                  <p className="text-xs text-gray-400 mt-0.5">Ритм для сна / медитации</p>
                 </div>
               </div>
             </div>
@@ -105,8 +160,8 @@ export default function EDEMLanding() {
         </section>
 
         {/* WHO IT'S FOR */}
-        <section className="mt-20 grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <article className="p-6 bg-gradient-to-b from-white/3 to-white/2 rounded-xl">
+        <section className="mt-24 grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <article className="group p-8 bg-gradient-to-br from-white/5 to-white/2 rounded-2xl border border-white/10 hover:border-amber-500/30 transition-all duration-300 hover:scale-105 backdrop-blur-sm shadow-xl">
             <h3 className="text-xl font-semibold">Для кого</h3>
             <p className="text-gray-300 mt-3">
               Для тех, кто устал от терапии и не нашёл тишины. Для людей, которые чувствуют глубину и хотят честности.
@@ -118,8 +173,9 @@ export default function EDEMLanding() {
             </ul>
           </article>
 
-          <article className="p-6 bg-gray-900/40 rounded-xl">
-            <h3 className="text-xl font-semibold">Как это работает</h3>
+          <article className="group p-8 bg-gradient-to-br from-gray-900/60 to-gray-800/40 rounded-2xl border border-white/5 hover:border-amber-500/30 transition-all duration-300 hover:scale-105 backdrop-blur-sm shadow-xl">
+            <div className="text-3xl mb-4">⚡</div>
+            <h3 className="text-xl font-bold mb-3 bg-gradient-to-r from-gray-100 to-gray-300 bg-clip-text text-transparent">Как это работает</h3>
             <p className="text-gray-300 mt-3">
               Ты говоришь — EDEM помнит весь контекст, расшифровывает сны, ищет ответы, видит психосоматику, прорабатывает блоки и страхи. Каждый голос адаптируется под 5 состояний: усталость, тревога, потерянность, злость, нейтральность.
             </p>
@@ -130,8 +186,9 @@ export default function EDEMLanding() {
             </div>
           </article>
 
-          <article className="p-6 bg-gray-900/40 rounded-xl">
-            <h3 className="text-xl font-semibold">Что даст тебе</h3>
+          <article className="group p-8 bg-gradient-to-br from-gray-900/60 to-gray-800/40 rounded-2xl border border-white/5 hover:border-amber-500/30 transition-all duration-300 hover:scale-105 backdrop-blur-sm shadow-xl">
+            <div className="text-3xl mb-4">🎯</div>
+            <h3 className="text-xl font-bold mb-3 bg-gradient-to-r from-gray-100 to-gray-300 bg-clip-text text-transparent">Что даст тебе</h3>
             <p className="text-gray-300 mt-3">
               Это будет лучше терапии. Контекст, расшифровка снов, поиск ответов, психосоматика, проработка блоков и страхов — всё в одном месте.
             </p>
@@ -150,51 +207,62 @@ export default function EDEMLanding() {
         </section>
 
         {/* FEATURES */}
-        <section className="mt-20">
-          <h3 className="text-2xl font-semibold">Возможности</h3>
-          <p className="text-gray-400 mt-2 max-w-2xl">
-            EDEM — это больше, чем чат. Это инструмент для глубокой работы с собой.
-          </p>
+        <section className="mt-24">
+          <div className="text-center mb-12">
+            <div className="inline-block px-4 py-1.5 rounded-full bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/20 text-amber-400 text-sm font-medium mb-4">
+              🚀 Возможности
+            </div>
+            <h3 className="text-4xl font-black mb-4 bg-gradient-to-r from-gray-100 via-gray-200 to-gray-300 bg-clip-text text-transparent">Возможности</h3>
+            <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+              EDEM — это больше, чем чат. Это инструмент для глубокой работы с собой.
+            </p>
+          </div>
 
-          <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div className="p-6 bg-gradient-to-b from-black/50 to-white/3 rounded-xl border border-white/3">
-              <h4 className="font-semibold text-lg">📚 Контекст</h4>
-              <p className="text-gray-400 mt-2 text-sm">
+          <div className="mt-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="group p-7 bg-gradient-to-br from-black/60 via-gray-900/40 to-black/60 rounded-2xl border border-white/5 hover:border-amber-500/40 transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-amber-500/10 backdrop-blur-sm">
+              <div className="text-4xl mb-4 group-hover:scale-110 transition-transform duration-300">📚</div>
+              <h4 className="font-bold text-xl mb-3 bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">Контекст</h4>
+              <p className="text-gray-400 text-sm leading-relaxed">
                 Помнит всю историю разговоров. Видит связи между событиями, чувствами, решениями. Понимает, откуда идёт боль.
               </p>
             </div>
 
-            <div className="p-6 bg-gradient-to-b from-black/50 to-white/3 rounded-xl border border-white/3">
-              <h4 className="font-semibold text-lg">🌙 Расшифровка снов</h4>
-              <p className="text-gray-400 mt-2 text-sm">
+            <div className="group p-7 bg-gradient-to-br from-black/60 via-gray-900/40 to-black/60 rounded-2xl border border-white/5 hover:border-amber-500/40 transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-amber-500/10 backdrop-blur-sm">
+              <div className="text-4xl mb-4 group-hover:scale-110 transition-transform duration-300">🌙</div>
+              <h4 className="font-bold text-xl mb-3 bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">Расшифровка снов</h4>
+              <p className="text-gray-400 text-sm leading-relaxed">
                 Понимает символы, образы, метафоры. Видит, что говорит твоё подсознание через сны. Находит скрытые смыслы.
               </p>
             </div>
 
-            <div className="p-6 bg-gradient-to-b from-black/50 to-white/3 rounded-xl border border-white/3">
-              <h4 className="font-semibold text-lg">🔍 Поиск ответов</h4>
-              <p className="text-gray-400 mt-2 text-sm">
+            <div className="group p-7 bg-gradient-to-br from-black/60 via-gray-900/40 to-black/60 rounded-2xl border border-white/5 hover:border-amber-500/40 transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-amber-500/10 backdrop-blur-sm">
+              <div className="text-4xl mb-4 group-hover:scale-110 transition-transform duration-300">🔍</div>
+              <h4 className="font-bold text-xl mb-3 bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">Поиск ответов</h4>
+              <p className="text-gray-400 text-sm leading-relaxed">
                 Не даёт готовые решения — помогает найти ответ внутри. Задаёт вопросы, которые ведут к истине.
               </p>
             </div>
 
-            <div className="p-6 bg-gradient-to-b from-black/50 to-white/3 rounded-xl border border-white/3">
-              <h4 className="font-semibold text-lg">💫 Психосоматика</h4>
-              <p className="text-gray-400 mt-2 text-sm">
+            <div className="group p-7 bg-gradient-to-br from-black/60 via-gray-900/40 to-black/60 rounded-2xl border border-white/5 hover:border-amber-500/40 transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-amber-500/10 backdrop-blur-sm">
+              <div className="text-4xl mb-4 group-hover:scale-110 transition-transform duration-300">💫</div>
+              <h4 className="font-bold text-xl mb-3 bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">Психосоматика</h4>
+              <p className="text-gray-400 text-sm leading-relaxed">
                 Видит связь между телом и душой. Понимает, как эмоции живут в теле. Помогает освободить зажатость.
               </p>
             </div>
 
-            <div className="p-6 bg-gradient-to-b from-black/50 to-white/3 rounded-xl border border-white/3">
-              <h4 className="font-semibold text-lg">🔓 Проработка блоков</h4>
-              <p className="text-gray-400 mt-2 text-sm">
+            <div className="group p-7 bg-gradient-to-br from-black/60 via-gray-900/40 to-black/60 rounded-2xl border border-white/5 hover:border-amber-500/40 transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-amber-500/10 backdrop-blur-sm">
+              <div className="text-4xl mb-4 group-hover:scale-110 transition-transform duration-300">🔓</div>
+              <h4 className="font-bold text-xl mb-3 bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">Проработка блоков</h4>
+              <p className="text-gray-400 text-sm leading-relaxed">
                 Мягко и глубоко работает с внутренними блоками. Не ломает, а растворяет. Возвращает телу свободу.
               </p>
             </div>
 
-            <div className="p-6 bg-gradient-to-b from-black/50 to-white/3 rounded-xl border border-white/3">
-              <h4 className="font-semibold text-lg">🌑 Проработка страхов</h4>
-              <p className="text-gray-400 mt-2 text-sm">
+            <div className="group p-7 bg-gradient-to-br from-black/60 via-gray-900/40 to-black/60 rounded-2xl border border-white/5 hover:border-amber-500/40 transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-amber-500/10 backdrop-blur-sm">
+              <div className="text-4xl mb-4 group-hover:scale-110 transition-transform duration-300">🌑</div>
+              <h4 className="font-bold text-xl mb-3 bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">Проработка страхов</h4>
+              <p className="text-gray-400 text-sm leading-relaxed">
                 Не утешает, а вскрывает корень страха. Показывает, откуда он идёт. Помогает встретиться с ним лицом к лицу.
               </p>
             </div>
@@ -202,15 +270,21 @@ export default function EDEMLanding() {
         </section>
 
         {/* VOICES */}
-        <section id="voices" className="mt-20">
-          <h3 className="text-2xl font-semibold">Два голоса</h3>
-          <p className="text-gray-400 mt-2 max-w-2xl">
-            Выбираешь голос вручную. Каждый голос адаптируется под твоё эмоциональное состояние — 5 режимов для точного попадания.
-          </p>
+        <section id="voices" className="mt-24">
+          <div className="text-center mb-12">
+            <div className="inline-block px-4 py-1.5 rounded-full bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/20 text-amber-400 text-sm font-medium mb-4">
+              🎭 Два голоса
+            </div>
+            <h3 className="text-4xl font-black mb-4 bg-gradient-to-r from-gray-100 via-gray-200 to-gray-300 bg-clip-text text-transparent">Два голоса</h3>
+            <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+              Выбираешь голос вручную. Каждый голос адаптируется под твоё эмоциональное состояние — 5 режимов для точного попадания.
+            </p>
+          </div>
 
-          <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="p-6 bg-gradient-to-b from-black/50 to-white/3 rounded-xl border border-white/3">
-              <h4 className="font-semibold text-lg">🌿 Голос Живого</h4>
+          <div className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="group p-8 bg-gradient-to-br from-emerald-900/20 via-gray-900/40 to-emerald-800/20 rounded-3xl border-2 border-emerald-500/20 hover:border-emerald-500/50 transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-emerald-500/20 backdrop-blur-xl">
+              <div className="text-5xl mb-5 group-hover:scale-110 transition-transform duration-300">🌿</div>
+              <h4 className="font-black text-2xl mb-3 bg-gradient-to-r from-emerald-400 to-green-400 bg-clip-text text-transparent">Голос Живого</h4>
               <p className="text-gray-400 mt-2 text-sm">
                 Мягко возвращает к центру, помогает успокоиться телу. Говорит просто, честно, с присутствием.
               </p>
@@ -219,8 +293,9 @@ export default function EDEMLanding() {
               </div>
             </div>
 
-            <div className="p-6 bg-gradient-to-b from-black/50 to-white/3 rounded-xl border border-white/3">
-              <h4 className="font-semibold text-lg">🌑 Голос Глубокой Тени</h4>
+            <div className="group p-8 bg-gradient-to-br from-gray-900/40 via-black/60 to-gray-900/40 rounded-3xl border-2 border-gray-700/30 hover:border-amber-500/50 transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-amber-500/20 backdrop-blur-xl">
+              <div className="text-5xl mb-5 group-hover:scale-110 transition-transform duration-300">🌑</div>
+              <h4 className="font-black text-2xl mb-3 bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">Голос Глубокой Тени</h4>
               <p className="text-gray-400 mt-2 text-sm">
                 Честно вскрывает правду, которую ты прячешь. Хирургически точно, но без агрессии.
               </p>
@@ -232,10 +307,15 @@ export default function EDEMLanding() {
         </section>
 
         {/* PRICING */}
-        <section id="pricing" className="mt-20">
-          <h3 className="text-2xl font-semibold">Тарифы</h3>
-          <div className="mt-6 grid grid-cols-1 md:grid-cols-4 gap-6">
-            <div className="p-6 bg-gray-900/40 rounded-xl text-center">
+        <section id="pricing" className="mt-24">
+          <div className="text-center mb-12">
+            <div className="inline-block px-4 py-1.5 rounded-full bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/20 text-amber-400 text-sm font-medium mb-4">
+              💎 Тарифы
+            </div>
+            <h3 className="text-4xl font-black mb-4 bg-gradient-to-r from-gray-100 via-gray-200 to-gray-300 bg-clip-text text-transparent">Тарифы</h3>
+          </div>
+          <div className="mt-10 grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div className="group p-8 bg-gradient-to-br from-gray-900/60 to-gray-800/40 rounded-2xl border border-white/5 hover:border-gray-600/50 transition-all duration-300 hover:scale-105 text-center backdrop-blur-sm">
               <p className="text-gray-400">FREE</p>
               <p className="text-3xl font-bold mt-4">$0</p>
               <p className="text-gray-400 mt-3">1 голос • 5 сообщений</p>
@@ -247,37 +327,43 @@ export default function EDEMLanding() {
               </Link>
             </div>
 
-            <div className="p-6 bg-gray-900/40 rounded-xl text-center border-2 border-amber-400/50">
-              <p className="text-gray-400">BASIC</p>
-              <p className="text-3xl font-bold mt-4">1500₽</p>
-              <p className="text-gray-400 mt-3">2 голоса • безлимит</p>
+            <div className="group relative p-8 bg-gradient-to-br from-amber-900/30 via-orange-900/20 to-amber-800/30 rounded-2xl border-2 border-amber-400/50 hover:border-amber-400 transition-all duration-300 hover:scale-105 text-center backdrop-blur-xl shadow-2xl shadow-amber-500/20">
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-gradient-to-r from-amber-400 to-orange-500 text-black text-xs font-black rounded-full">
+                ПОПУЛЯРНЫЙ
+              </div>
+              <p className="text-gray-300 font-bold text-sm mt-2">BASIC</p>
+              <p className="text-4xl font-black mt-4 bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">1500₽</p>
+              <p className="text-gray-300 mt-3 font-medium">2 голоса • безлимит</p>
               <Link
                 href="/login"
-                className="mt-6 inline-block px-4 py-2 rounded-full bg-amber-400 text-black font-semibold hover:opacity-95"
+                className="mt-6 inline-block px-6 py-3 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 text-black font-bold hover:from-amber-300 hover:to-orange-400 transition-all duration-300 shadow-lg shadow-amber-500/30 hover:shadow-amber-500/50"
               >
                 Купить
               </Link>
             </div>
 
-            <div className="p-6 bg-gray-900/40 rounded-xl text-center">
-              <p className="text-gray-400">PLUS</p>
-              <p className="text-3xl font-bold mt-4">2900₽</p>
-              <p className="text-gray-400 mt-3">2 голоса • безлимит</p>
+            <div className="group p-8 bg-gradient-to-br from-gray-900/60 to-gray-800/40 rounded-2xl border border-white/5 hover:border-gray-600/50 transition-all duration-300 hover:scale-105 text-center backdrop-blur-sm">
+              <p className="text-gray-300 font-bold text-sm">PLUS</p>
+              <p className="text-4xl font-black mt-4 text-gray-100">2900₽</p>
+              <p className="text-gray-300 mt-3 font-medium">2 голоса • безлимит</p>
               <Link
                 href="/login"
-                className="mt-6 inline-block px-4 py-2 rounded-full bg-amber-400 text-black font-semibold hover:opacity-95"
+                className="mt-6 inline-block px-6 py-3 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 text-black font-bold hover:from-amber-300 hover:to-orange-400 transition-all duration-300 shadow-lg shadow-amber-500/30 hover:shadow-amber-500/50"
               >
                 Купить
               </Link>
             </div>
 
-            <div className="p-6 bg-gradient-to-b from-amber-400 to-orange-400 rounded-xl text-center text-black">
-              <p className="text-gray-900">PRO</p>
-              <p className="text-3xl font-bold mt-4">4900₽</p>
-              <p className="text-gray-900 mt-3">2 голоса • премиум</p>
+            <div className="group relative p-8 bg-gradient-to-br from-amber-400 via-orange-400 to-amber-500 rounded-2xl text-center text-black shadow-2xl shadow-amber-500/30 hover:shadow-amber-500/50 transition-all duration-300 hover:scale-105">
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-black text-amber-300 text-xs font-black rounded-full">
+                ПРЕМИУМ
+              </div>
+              <p className="text-gray-900 font-black text-sm mt-2">PRO</p>
+              <p className="text-5xl font-black mt-4 text-black">4900₽</p>
+              <p className="text-gray-900 mt-3 font-bold">2 голоса • премиум</p>
               <Link
                 href="/login"
-                className="mt-6 inline-block px-4 py-2 rounded-full bg-black text-amber-300 font-semibold hover:opacity-95"
+                className="mt-6 inline-block px-6 py-3 rounded-full bg-black text-amber-300 font-black hover:bg-gray-900 transition-all duration-300 shadow-lg"
               >
                 Купить
               </Link>
@@ -286,20 +372,27 @@ export default function EDEMLanding() {
         </section>
 
         {/* CTA */}
-        <section className="mt-20 bg-gradient-to-b from-white/2 to-white/3 rounded-xl p-8 flex flex-col md:flex-row items-center justify-between">
-          <div>
-            <h4 className="text-xl font-semibold">Вернись домой. В самого себя.</h4>
-            <p className="text-gray-300 mt-2">
-              Подключись и начни с простого: 5 бесплатных сообщений с голосом Живого. Почувствуй ритм.
-            </p>
-          </div>
-          <div className="mt-6 md:mt-0">
-            <Link
-              href="/login"
-              className="px-6 py-3 rounded-full bg-amber-400 text-black font-semibold hover:opacity-95"
-            >
-              Начать сейчас
-            </Link>
+        <section className="mt-24 relative bg-gradient-to-br from-amber-900/20 via-orange-900/10 to-amber-800/20 rounded-3xl p-10 md:p-12 border-2 border-amber-500/20 backdrop-blur-xl overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-orange-500/5"></div>
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(251,191,36,0.1),transparent_70%)]"></div>
+          <div className="relative flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="flex-1">
+              <h4 className="text-3xl md:text-4xl font-black mb-4 bg-gradient-to-r from-gray-100 via-amber-200 to-orange-200 bg-clip-text text-transparent">
+                Вернись домой. В самого себя.
+              </h4>
+              <p className="text-gray-300 text-lg leading-relaxed">
+                Подключись и начни с простого: 5 бесплатных сообщений с голосом Живого. Почувствуй ритм.
+              </p>
+            </div>
+            <div className="mt-6 md:mt-0">
+              <Link
+                href="/login"
+                className="group relative px-10 py-5 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 text-black font-black text-lg hover:from-amber-300 hover:to-orange-400 transition-all duration-300 shadow-2xl shadow-amber-500/40 hover:shadow-amber-500/60 hover:scale-105"
+              >
+                <span className="relative z-10">Начать сейчас</span>
+                <div className="absolute inset-0 rounded-full bg-gradient-to-r from-amber-500 to-orange-600 opacity-0 group-hover:opacity-100 blur-xl transition-opacity"></div>
+              </Link>
+            </div>
           </div>
         </section>
       </main>
