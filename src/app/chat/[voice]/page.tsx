@@ -447,9 +447,6 @@ export default function ChatVoicePage(props: any) {
             const voiceColors: Record<VoiceId, string> = {
               live: '#4EAEC1',
               shadow: '#C95B5B',
-              mirror: '#B6A8FF',
-              child: '#A0D17A',
-              sage: '#C1934E',
             };
             const accentColor = voiceColors[voiceId] || '#4EAEC1';
 
