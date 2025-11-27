@@ -106,11 +106,10 @@ export default function ChatPanel({
               <button
                 key={voice.id}
                 onClick={() => setSelectedVoice(voice.id as VoiceId)}
-                className={`px-4 py-2 rounded-xl border transition-all whitespace-nowrap ${
-                  selectedVoice === voice.id
+                className={`px-4 py-2 rounded-xl border transition-all whitespace-nowrap ${selectedVoice === voice.id
                     ? 'border-edem-live bg-edem-live/10 text-edem-main'
                     : 'border-edem-line bg-edem-surface text-edem-secondary hover:border-edem-muted'
-                }`}
+                  }`}
               >
                 <span className="text-lg mr-2">{voice.emoji}</span>
                 <span className="text-sm font-medium">{voice.title}</span>
@@ -142,11 +141,10 @@ export default function ChatPanel({
               className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
             >
               <div
-                className={`max-w-[80%] rounded-2xl px-4 py-3 inner-shadow-edem ${
-                  msg.role === 'user'
+                className={`max-w-[80%] rounded-2xl px-4 py-3 inner-shadow-edem ${msg.role === 'user'
                     ? 'bg-gradient-to-r from-edem-surface to-edem-secondary-bg text-edem-main'
                     : 'card-edem text-edem-main'
-                }`}
+                  }`}
               >
                 <p className="whitespace-pre-wrap">{msg.text}</p>
               </div>

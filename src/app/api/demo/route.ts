@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
     }
 
     const token = authHeader.replace('Bearer ', '').trim();
-    
+
     if (!token) {
       console.error('Empty token');
       return NextResponse.json(
@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
         { status: 401 }
       );
     }
-    
+
     // Для проверки пользовательского токена используем anon key
     const supabaseAuth = createClient(supabaseUrl, supabaseAnonKey);
 
@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
         tokenStart: token.substring(0, 20) + '...'
       });
       return NextResponse.json(
-        { 
+        {
           error: authError?.message || 'Не авторизован',
           details: process.env.NODE_ENV === 'development' ? authError : undefined
         },

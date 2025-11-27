@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
           status: subscription.status === 'active' ? 'active' : 'inactive',
           stripe_customer_id: subscription.customer as string,
           stripe_subscription_id: subscription.id,
-          current_period_end: subscription.current_period_end 
+          current_period_end: subscription.current_period_end
             ? new Date(subscription.current_period_end * 1000).toISOString()
             : null,
         });

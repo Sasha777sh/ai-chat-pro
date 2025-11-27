@@ -16,7 +16,7 @@ export default function DemoPage() {
   const [loading, setLoading] = useState(false);
   const [userMessagesCount, setUserMessagesCount] = useState(0);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  
+
   const DEMO_LIMIT = 5; // 5 сообщений пользователя
 
   useEffect(() => {
@@ -131,16 +131,14 @@ export default function DemoPage() {
             {messages.map((msg, idx) => (
               <div
                 key={idx}
-                className={`flex ${
-                  msg.role === 'user' ? 'justify-end' : 'justify-start'
-                }`}
+                className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'
+                  }`}
               >
                 <div
-                  className={`max-w-[80%] rounded-2xl px-4 py-3 inner-shadow-edem ${
-                    msg.role === 'user'
+                  className={`max-w-[80%] rounded-2xl px-4 py-3 inner-shadow-edem ${msg.role === 'user'
                       ? 'bg-gradient-to-r from-edem-surface to-edem-secondary-bg text-edem-main'
                       : 'card-edem text-edem-main'
-                  }`}
+                    }`}
                 >
                   <p className="whitespace-pre-wrap">{msg.content}</p>
                 </div>
