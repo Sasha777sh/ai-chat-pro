@@ -122,14 +122,15 @@ npm run dev
 
 ## 🎯 КОНКРЕТНЫЕ ДЕЙСТВИЯ
 
-### ДЛЯ BACKEND РАЗРАБОТЧИКА:
+### ДЛЯ BACKEND РАЗРАБОТЧИКА
 
 1. **Открой Vercel Dashboard:**
-   - https://vercel.com/dashboard
+   - <https://vercel.com/dashboard>
    - Найди проект `ai-chat-pro` или `chatedem`
    - Settings → Environment Variables
 
 2. **Проверь переменные:**
+
    ```
    NEXT_PUBLIC_SUPABASE_URL = https://xxx.supabase.co
    NEXT_PUBLIC_SUPABASE_ANON_KEY = eyJ... (ANON KEY!)
@@ -145,9 +146,10 @@ npm run dev
 
 ---
 
-### ДЛЯ DEVOPS:
+### ДЛЯ DEVOPS
 
 1. **Проверь логи Vercel:**
+
    ```
    Vercel Dashboard → Project → Logs
    Фильтр: "register" или "auth"
@@ -155,6 +157,7 @@ npm run dev
    ```
 
 2. **Проверь Supabase логи:**
+
    ```
    Supabase Dashboard → Logs → API Logs
    Фильтр: "createUser" или "auth"
@@ -166,9 +169,10 @@ npm run dev
 
 ---
 
-### ДЛЯ QA:
+### ДЛЯ QA
 
 1. **Создай тестовый аккаунт вручную:**
+
    ```sql
    -- В Supabase SQL Editor:
    INSERT INTO auth.users (id, email, encrypted_password, email_confirmed_at, created_at)
@@ -188,7 +192,7 @@ npm run dev
 
 ## 🚨 ЕСЛИ НИЧЕГО НЕ ПОМОГАЕТ
 
-### ВРЕМЕННОЕ РЕШЕНИЕ:
+### ВРЕМЕННОЕ РЕШЕНИЕ
 
 1. **Создай тестовые аккаунты вручную:**
    - В Supabase Dashboard → Authentication → Users
@@ -196,6 +200,7 @@ npm run dev
    - Раздай их тестировщикам
 
 2. **Добавь bypass для демо:**
+
    ```typescript
    // В src/app/signup/page.tsx добавь кнопку:
    <button onClick={() => {
@@ -211,6 +216,7 @@ npm run dev
 ## 📞 ЕСЛИ НУЖНА ПОМОЩЬ
 
 **Пришли мне:**
+
 1. Скриншот ошибки из браузера (F12 → Console)
 2. Логи из Vercel (последние 10 строк)
 3. Логи из Supabase (API Logs)
@@ -232,4 +238,3 @@ npm run dev
 - [ ] Тестовый аккаунт создан
 
 **После выполнения всех пунктов → регистрация должна работать! ✅**
-
