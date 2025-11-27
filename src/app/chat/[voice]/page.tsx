@@ -13,6 +13,7 @@ import type { PlanId } from '@/lib/plans';
 import { getAllowedVoices } from '@/lib/plans';
 import { FREE_MESSAGE_ALLOWANCE } from '@/lib/prompts';
 import PaywallModal from '@/components/PaywallModal';
+import { analytics, trackChatMessage, trackVoiceSelection } from '@/lib/analytics';
 
 const DEFAULT_VOICE: VoiceId = 'live';
 
