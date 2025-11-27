@@ -6,7 +6,13 @@ export async function POST(request: Request) {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
+    // Детальное логирование для отладки
+    console.log('[REGISTER] Starting registration process');
+    console.log('[REGISTER] Supabase URL:', supabaseUrl ? '✅ Set' : '❌ Missing');
+    console.log('[REGISTER] Service Role Key:', serviceRoleKey ? '✅ Set (length: ' + serviceRoleKey.length + ')' : '❌ Missing');
+
     if (!supabaseUrl || !serviceRoleKey) {
+      console.error('[REGISTER] Missing Supabase credentials');
       return NextResponse.json(
         { error: 'Supabase credentials are not configured' },
         { status: 500 }
@@ -27,8 +33,10 @@ export async function POST(request: Request) {
     }
 
     const trimmedEmail = String(email).trim().toLowerCase();
+    console.log('[REGISTER] Processing email:', trimmedEmail);
 
     // Проверяем, существует ли пользователь с таким email
+    console.log('[REGISTER] Checking existing profile...');
     const { data: existingProfile, error: profileError } = await supabaseAdmin
       .from('profiles')
       .select('id')
@@ -36,14 +44,19 @@ export async function POST(request: Request) {
       .maybeSingle();
 
     if (profileError && profileError.code !== 'PGRST116') {
+      console.error('[REGISTER] Profile check error:', profileError);
       return NextResponse.json({ error: profileError.message }, { status: 400 });
     }
 
     if (existingProfile) {
+      console.log('[REGISTER] User already exists');
       return NextResponse.json({ error: 'Пользователь с таким email уже существует' }, { status: 409 });
     }
 
+    console.log('[REGISTER] No existing user found, creating new user...');
+
     // Создаём пользователя с мгновенным подтверждением email
+    console.log('[REGISTER] Calling Supabase admin.createUser...');
     const { data: createdUser, error: createError } = await supabaseAdmin.auth.admin.createUser({
       email: trimmedEmail,
       password,
@@ -51,7 +64,11 @@ export async function POST(request: Request) {
     });
 
     if (createError) {
-      console.error('User creation error:', createError);
+      console.error('[REGISTER] User creation error:', {
+        message: createError.message,
+        status: createError.status,
+        name: createError.name,
+      });
       // Более понятные сообщения об ошибках
       if (createError.message.includes('already registered') || createError.message.includes('already exists')) {
         return NextResponse.json({ error: 'Пользователь с таким email уже существует' }, { status: 409 });
@@ -69,11 +86,15 @@ export async function POST(request: Request) {
     }
 
     if (!createdUser?.user?.id) {
-      console.error('User created but no user ID returned');
+      console.error('[REGISTER] User created but no user ID returned');
+      console.error('[REGISTER] Created user data:', JSON.stringify(createdUser, null, 2));
       return NextResponse.json({ error: 'Пользователь создан, но не удалось получить ID' }, { status: 500 });
     }
 
+    console.log('[REGISTER] User created successfully, ID:', createdUser.user.id);
+
     // Явно создаём профиль (на случай, если триггер не сработал)
+    console.log('[REGISTER] Creating profile...');
     const { error: profileCreateError } = await supabaseAdmin
       .from('profiles')
       .upsert(
@@ -88,11 +109,14 @@ export async function POST(request: Request) {
       );
 
     if (profileCreateError) {
-      console.error('Profile creation error:', profileCreateError);
+      console.error('[REGISTER] Profile creation error:', profileCreateError);
       // Не возвращаем ошибку, т.к. пользователь уже создан, профиль может быть создан триггером
       // Но логируем для отладки
+    } else {
+      console.log('[REGISTER] Profile created successfully');
     }
 
+    console.log('[REGISTER] Registration completed successfully');
     return NextResponse.json({
       success: true,
       userId: createdUser.user.id,
@@ -100,6 +124,10 @@ export async function POST(request: Request) {
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Неизвестная ошибка';
+    console.error('[REGISTER] Unexpected error:', {
+      message,
+      stack: error instanceof Error ? error.stack : undefined,
+    });
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }
