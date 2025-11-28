@@ -145,3 +145,4 @@ export function checkSpamRate(messageCount: number, timeWindow: number): boolean
   return messagesPerMinute > maxMessagesPerMinute;
 }
 
+

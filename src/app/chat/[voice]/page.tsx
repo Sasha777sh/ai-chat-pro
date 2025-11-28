@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState, useOptimistic } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
 
 import { supabase } from '@/lib/supabase';
@@ -237,6 +237,7 @@ export default function ChatVoicePage(props: any) {
           sessionId,
           message: messageText,
           voiceId,
+          productMode: productMode || undefined,
         }),
       });
 

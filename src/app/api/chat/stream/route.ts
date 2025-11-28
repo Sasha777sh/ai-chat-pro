@@ -10,6 +10,8 @@ import { getAllowedVoices } from '@/lib/plans';
 import { FREE_MESSAGE_ALLOWANCE } from '@/lib/prompts';
 import { detectEmotion } from '@/lib/edem-orchestra';
 import { detectLanguage, type SupportedLanguage } from '@/lib/languageRouter';
+import { isProductModeSupported, type ProductMode } from '@/lib/products';
+import { getProductModePrompt } from '@/lib/product-prompts';
 // Оркестратор убран - используем только ручной выбор голоса
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
@@ -21,7 +23,7 @@ const openai = new OpenAI({ apiKey: openaiApiKey });
 
 export async function POST(request: NextRequest) {
   try {
-    const { sessionId, message, voiceId: requestedVoiceId, locale = 'ru' } = await request.json();
+    const { sessionId, message, voiceId: requestedVoiceId, locale = 'ru', productMode } = await request.json();
 
     if (!sessionId || !message) {
       return new Response(

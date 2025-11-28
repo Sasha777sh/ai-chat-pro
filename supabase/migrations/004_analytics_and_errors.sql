@@ -72,3 +72,4 @@ COMMENT ON COLUMN public.error_logs.message IS 'Текст ошибки';
 COMMENT ON COLUMN public.error_logs.stack IS 'Стек вызовов ошибки';
 COMMENT ON COLUMN public.error_logs.context IS 'Контекст ошибки (компонент, URL и т.д.)';
 
+

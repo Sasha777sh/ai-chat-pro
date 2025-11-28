@@ -3,6 +3,9 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { SHADOW_OFFERS, LIVE_OFFERS, LANDING_OFFERS } from '@/lib/offers';
+import { getAllProducts } from '@/lib/products';
+import ProductCard from './ProductCard';
 
 // EDEM Landing - Single-file React component (Tailwind CSS)
 // Обновлено под систему из 2 голосов с улучшенным дизайном
