@@ -27,6 +27,8 @@ export default function ChatVoicePage(props: any) {
   const routeVoice = (params?.voice as VoiceId) || DEFAULT_VOICE;
   const voiceId = VOICE_LOOKUP[routeVoice] ? routeVoice : DEFAULT_VOICE;
   const voiceMeta = VOICE_LOOKUP[voiceId];
+  const searchParams = useSearchParams();
+  const productMode = searchParams.get('mode') || undefined;
 
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');

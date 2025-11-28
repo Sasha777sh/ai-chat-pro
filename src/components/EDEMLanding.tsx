@@ -403,6 +403,114 @@ export default function EDEMLanding() {
             </div>
           </div>
         </section>
+
+        {/* OFFERS SECTION */}
+        <section className="mt-24">
+          <h2 className="text-4xl font-black mb-8 text-center bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">
+            Офферы EDEM
+          </h2>
+          <div className="grid md:grid-cols-2 gap-4 mb-12">
+            {LANDING_OFFERS.slice(0, 4).map((offer, idx) => (
+              <div 
+                key={idx}
+                className="p-6 rounded-2xl bg-gradient-to-br from-amber-500/10 to-orange-500/10 border border-amber-500/20 backdrop-blur-sm"
+              >
+                <p className="text-gray-200 text-lg font-medium leading-relaxed">
+                  {offer}
+                </p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* SHADOW OFFERS PREVIEW */}
+        <section className="mt-16">
+          <div className="flex items-center gap-3 mb-6">
+            <span className="text-3xl">🌑</span>
+            <h3 className="text-3xl font-black bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">
+              Офферы под Голос Тени
+            </h3>
+          </div>
+          <p className="text-gray-400 mb-6">
+            Хирургия правды. Вскрытие. Честность. Разрыв программ.
+          </p>
+          <div className="grid md:grid-cols-2 gap-4 mb-8">
+            {SHADOW_OFFERS.slice(0, 4).map((offer) => (
+              <div 
+                key={offer.id}
+                className="p-5 rounded-xl bg-gradient-to-br from-amber-500/10 to-orange-500/10 border border-amber-500/20 backdrop-blur-sm"
+              >
+                <p className="text-gray-200 font-medium leading-relaxed">
+                  {offer.text}
+                </p>
+              </div>
+            ))}
+          </div>
+          <div className="text-center">
+            <Link
+              href="/offers/shadow"
+              className="inline-block px-6 py-3 rounded-full border-2 border-gray-700/50 text-gray-300 hover:border-amber-500/50 hover:text-amber-400 font-semibold transition-all"
+            >
+              Все офферы Тени →
+            </Link>
+          </div>
+        </section>
+
+        {/* LIVE OFFERS PREVIEW */}
+        <section className="mt-16">
+          <div className="flex items-center gap-3 mb-6">
+            <span className="text-3xl">🌿</span>
+            <h3 className="text-3xl font-black bg-gradient-to-r from-emerald-400 to-green-400 bg-clip-text text-transparent">
+              Офферы под Голос Живого
+            </h3>
+          </div>
+          <p className="text-gray-400 mb-6">
+            Тепло. Присутствие. Поддержка. Дыхание. Возвращение к себе.
+          </p>
+          <div className="grid md:grid-cols-2 gap-4 mb-8">
+            {LIVE_OFFERS.slice(0, 4).map((offer) => (
+              <div 
+                key={offer.id}
+                className="p-5 rounded-xl bg-gradient-to-br from-emerald-500/10 to-green-500/10 border border-emerald-500/20 backdrop-blur-sm"
+              >
+                <p className="text-gray-200 font-medium leading-relaxed">
+                  {offer.text}
+                </p>
+              </div>
+            ))}
+          </div>
+          <div className="text-center">
+            <Link
+              href="/offers/live"
+              className="inline-block px-6 py-3 rounded-full border-2 border-gray-700/50 text-gray-300 hover:border-emerald-500/50 hover:text-emerald-400 font-semibold transition-all"
+            >
+              Все офферы Живого →
+            </Link>
+          </div>
+        </section>
+
+        {/* PRODUCTS PREVIEW */}
+        <section className="mt-24" id="products">
+          <h2 className="text-4xl font-black mb-4 text-center bg-gradient-to-r from-gray-100 via-gray-200 to-gray-300 bg-clip-text text-transparent">
+            Продукты EDEM
+          </h2>
+          <p className="text-center text-gray-400 mb-12 max-w-2xl mx-auto">
+            Система продуктов на основе двух голосов: Тень и Живое
+          </p>
+          <div className="grid md:grid-cols-3 gap-6 mb-8">
+            {getAllProducts().slice(0, 3).map((product) => (
+              <ProductCard key={product.id} product={product} compact />
+            ))}
+          </div>
+          <div className="text-center">
+            <Link
+              href="/products"
+              className="inline-block px-8 py-4 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 text-black font-bold hover:from-amber-300 hover:to-orange-400 transition-all shadow-lg shadow-amber-500/30 hover:shadow-amber-500/50 hover:scale-105"
+            >
+              Все продукты →
+            </Link>
+          </div>
+        </section>
       </main>
 
       {/* FOOTER */}
