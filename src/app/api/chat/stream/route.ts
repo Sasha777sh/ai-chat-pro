@@ -1,4 +1,5 @@
 import { NextRequest } from 'next/server';
+import { moderateUserMessage } from '@/lib/content-moderation';
 import { createClient } from '@supabase/supabase-js';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import OpenAI from 'openai';
@@ -25,6 +26,19 @@ export async function POST(request: NextRequest) {
     if (!sessionId || !message) {
       return new Response(
         JSON.stringify({ error: 'sessionId и message обязательны' }),
+        { status: 400, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Модерация пользовательского сообщения
+    const moderationResult = moderateUserMessage(message);
+    if (!moderationResult.allowed) {
+      return new Response(
+        JSON.stringify({ 
+          error: moderationResult.reason || 'Сообщение не прошло модерацию',
+          code: 'CONTENT_MODERATION_FAILED',
+          severity: moderationResult.severity,
+        }),
         { status: 400, headers: { 'Content-Type': 'application/json' } }
       );
     }
